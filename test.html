@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<title>لوحة الإحصائيات</title>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; }
+  body {
+    background: #1a1a2e; /* خلفية داكنة احترافية للإحصائيات */
+    color: #fff;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .stats-card {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    padding: 40px;
+    border-radius: 30px;
+    text-align: center;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 40px rgba(102, 126, 234, 0.2);
+    width: 90%;
+    max-width: 500px;
+    animation: float 6s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-20px); }
+    100% { transform: translateY(0px); }
+  }
+
+  h1 {
+    font-size: 1.5em;
+    margin-bottom: 20px;
+    color: #a0a0a0;
+  }
+
+  .counter-box {
+    font-size: 6em;
+    font-weight: 900;
+    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin: 10px 0;
+    text-shadow: 0 10px 20px rgba(0,0,0,0.3);
+    transition: all 0.3s ease;
+  }
+  
+  .pulse {
+    animation: pulse-animation 0.5s ease-in-out;
+  }
+
+  @keyframes pulse-animation {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+    100% { transform: scale(1); }
+  }
+
+  .sub-text {
+    font-size: 1.2em;
+    color: #fff;
+  }
+
+  /* Notification Toast */
+  .toast-container {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+  }
+
+  .toast {
+    background: #fff;
+    color: #333;
+    padding: 15px 25px;
+    margin-bottom: 10px;
+    border-radius: 12px;
+    border-left: 5px solid #0072ff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-weight: bold;
+    animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease 4s forwards;
+    min-width: 250px;
+  }
+
+  @keyframes slideIn {
+    from { transform: translateX(-100%); opacity: 0; }
+    to { transform: translateX(0); opacity: 1; }
+  }
+  @keyframes fadeOut {
+    to { opacity: 0; transform: translateY(-20px); }
+  }
+
+  .reset-btn {
+    margin-top: 30px;
+    background: rgba(255,255,255,0.1);
+    border: 1px solid rgba(255,255,255,0.3);
+    color: #aaa;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: 0.3s;
+  }
+  .reset-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+
+</style>
+</head>
+<body>
+
+<div class="toast-container" id="toast-container"></div>
+
+<div class="stats-card">
+  <h1>عدد المتواجدين (المسجلين دخول)</h1>
+  <div class="counter-box" id="counter">0</div>
+  <div class="sub-text">مستخدم نشط الآن</div>
+  
+  <button class="reset-btn" onclick="resetCounter()">تصفير العداد</button>
+</div>
+
+<script>
+  // قراءة العدد الحالي عند فتح الصفحة
+  let count = parseInt(localStorage.getItem("users_count") || "0");
+  const counterEl = document.getElementById("counter");
+  counterEl.innerText = count;
+
+  // الاستماع لأي تغيير في localStorage (يحدث عند دخول شخص في الصفحة الأولى)
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'new_login_event') {
+      // زيادة العداد
+      count = parseInt(localStorage.getItem("users_count") || "0");
+      updateDisplay();
+      showNotification();
+    }
+  });
+
+  function updateDisplay() {
+    counterEl.innerText = count;
+    // تأثير نبض عند تغير الرقم
+    counterEl.classList.remove("pulse");
+    void counterEl.offsetWidth; // trigger reflow
+    counterEl.classList.add("pulse");
+  }
+
+  function showNotification() {
+    const container = document.getElementById("toast-container");
+    const toast = document.createElement("div");
+    toast.className = "toast";
+    toast.innerHTML = `
+      <span style="font-size:1.2em">🔔</span>
+      <div>
+        <div>دخول جديد!</div>
+        <div style="font-size:0.8em; color:#666">تم تسجيل مستخدم بالرقم السري</div>
+      </div>
+    `;
+    container.appendChild(toast);
+
+    // إزالة العنصر من DOM بعد انتهاء الانيميشن
+    setTimeout(() => {
+      toast.remove();
+    }, 4500);
+  }
+
+  function resetCounter() {
+    localStorage.setItem("users_count", "0");
+    count = 0;
+    updateDisplay();
+  }
+</script>
+
+</body>
+</html>
