@@ -2,38 +2,30 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<title>تسجيل التصويت - متصل</title>
+<title>تسجيل التصويت</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-/* نفس التنسيقات الأساسية */
+/* نفس التنسيقات السابقة تماماً */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; }
 body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; color: #fff; overflow-x: hidden; }
 .hidden { display: none !important; }
-
-/* شاشة كلمة السر */
 #password-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
 .pass-box { width: 95%; max-width: 400px; background: #fff; color: #222; padding: 35px 18px; border-radius: 18px; text-align: center; }
 .pass-input { width: 100%; padding: 14px; margin-top: 20px; text-align: center; border-radius: 12px; border: 2px solid #e0e7ff; background: #f8f9ff; font-size: 1.1em; }
 .pass-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
 .pass-err { margin-top: 12px; color: #c62828; display: none; }
-
-/* الحاوية الرئيسية */
 .container { width: 100%; max-width: 420px; background: #fff; color: #222; padding: 26px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: fade 0.5s ease; }
 @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 h2 { text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2em; font-weight: 900; margin-bottom: 10px; }
-
-/* عناصر النموذج */
 .committee-info { text-align: center; margin: 12px 0 25px; background: #f5f7ff; padding: 12px; border-radius: 12px; border-left: 4px solid #667eea; }
 label { font-weight: 700; color: #333; margin-top: 16px; display: block; }
 input[type="text"] { width: 100%; padding: 13px 12px; border-radius: 12px; border: 2px solid #e0e7ff; background: #f8f9ff; margin-top: 8px; }
-
 .candidate-list { margin-top: 10px; background: #f8f9ff; border: 2px solid #e0e7ff; border-radius: 14px; max-height: 320px; overflow-y: auto; padding: 8px; }
 .candidate-item { background: #fff; border: 1px solid #e8ecff; padding: 10px; margin-bottom: 9px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; cursor: pointer; border-left: 4px solid #667eea; transition:0.3s;}
 .candidate-item.selected { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
 .radio-group { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top:10px; }
 .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #fff; border-radius: 10px; border: 2px solid #e0e7ff; }
 .radio-item.selected { background: #667eea; color: #fff; }
-
 .btn-row { display: flex; gap: 10px; margin-top: 23px; }
 button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; }
 .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
@@ -41,35 +33,12 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
 .action-btn { width: 100%; margin-top: 15px; padding: 13px; background: linear-gradient(135deg, #4c28d3 0%, #7d45ff 100%); color: #fff; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; }
 .msg-confirm { display: none; margin-top: 12px; padding: 11px; border-radius: 10px; text-align: center; font-weight: 700; background: #e8f5e9; color: #2e7d32; }
 
-/* --- [تعديل] تصميم الرسالة المنبثقة (أسفل اليمين) --- */
-#admin-msg-popup {
-    position: fixed; 
-    bottom: 20px; /* أسفل */
-    right: 20px;  /* يمين */
-    background: #fff; 
-    border-right: 6px solid #ff9800; /* الخط الملون يمين */
-    padding: 15px 20px;
-    border-radius: 12px; 
-    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
-    z-index: 10000; 
-    display: flex; 
-    align-items: flex-start; 
-    gap: 15px;
-    min-width: 320px; 
-    max-width: 90vw;
-    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
-}
-
-@keyframes slideUp { 
-    from { bottom: -150px; opacity: 0; } 
-    to { bottom: 20px; opacity: 1; } 
-}
-
+/* Popup Styles */
+#admin-msg-popup { position: fixed; bottom: 20px; right: 20px; background: #fff; border-right: 6px solid #ff9800; padding: 15px 20px; border-radius: 12px; box-shadow: 0 10px 40px rgba(0,0,0,0.4); z-index: 10000; display: flex; align-items: flex-start; gap: 15px; min-width: 320px; max-width: 90vw; animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideUp { from { bottom: -150px; opacity: 0; } to { bottom: 20px; opacity: 1; } }
 .admin-msg-content { color: #333; font-weight: bold; line-height: 1.5; font-size: 1.05em; margin-top: 5px; }
-.close-popup { cursor: pointer; color: #aaa; font-size: 1.4em; margin-right: auto; transition: 0.3s; }
-.close-popup:hover { color: #ff9800; }
+.close-popup { cursor: pointer; color: #aaa; font-size: 1.4em; margin-right: auto; }
 
-/* معاينة الصورة */
 #preview-container { margin-top: 15px; display: none; text-align: center; }
 #preview-img { max-width: 100%; border-radius: 10px; border: 2px solid #4caf50; padding: 5px; background: #fff; }
 </style>
@@ -174,7 +143,6 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
         const popup = document.getElementById("admin-msg-popup");
         document.getElementById("admin-msg-text").textContent = data.text;
         popup.classList.remove("hidden");
-        // إخفاء تلقائي بعد 15 ثانية
         setTimeout(() => popup.classList.add("hidden"), 15000);
       }
     });
@@ -230,20 +198,37 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
       });
   });
 
+  // --- [تعديل هام] كود إرسال التصويت للقاعدة ---
   document.getElementById("vote-form").onsubmit = function(e) {
       e.preventDefault();
-      const sel = document.querySelectorAll(".candidate-checkbox:checked");
+      
+      const voterName = document.getElementById("voter-name").value.trim() || "فاعل خير";
+      const sel = Array.from(document.querySelectorAll(".candidate-checkbox:checked")).map(cb => cb.value);
       const val = document.querySelector("input[name='vvalid']:checked");
+
       if(sel.length !== 2) return alert("اختر مرشحين اثنين");
       if(!val) return alert("اختر حالة الصوت");
-      const confirmMsg = document.getElementById("msg-confirm");
-      confirmMsg.innerText = "تم إرسال الصوت للقاعدة بنجاح ✅";
-      confirmMsg.style.display = "block";
-      setTimeout(() => {
-          confirmMsg.style.display = "none";
-          this.reset();
-          resetStyle();
-      }, 2000);
+
+      // إرسال البيانات لـ Firebase
+      const votesRef = ref(db, 'votes');
+      push(votesRef, {
+        name: voterName,
+        candidates: sel,
+        status: val.value,
+        timestamp: Date.now()
+      }).then(() => {
+          const confirmMsg = document.getElementById("msg-confirm");
+          confirmMsg.innerText = "تم إرسال الصوت للقاعدة بنجاح ✅";
+          confirmMsg.style.display = "block";
+          
+          setTimeout(() => {
+              confirmMsg.style.display = "none";
+              this.reset();
+              resetStyle();
+          }, 2000);
+      }).catch(err => {
+          alert("حدث خطأ أثناء الإرسال: " + err.message);
+      });
   };
 
   window.handleFileUpload = function(input) {
