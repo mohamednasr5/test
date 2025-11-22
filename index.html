@@ -5,15 +5,31 @@
 <title>تسجيل التصويت</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-/* نفس التنسيقات السابقة */
+/* نفس التنسيقات السابقة تماماً */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; }
 body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; color: #fff; overflow-x: hidden; }
 .hidden { display: none !important; }
+
+/* شاشة كلمة السر */
 #password-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.9); backdrop-filter: blur(5px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
 .pass-box { width: 95%; max-width: 400px; background: #fff; color: #222; padding: 35px 18px; border-radius: 18px; text-align: center; }
-.pass-input { width: 100%; padding: 14px; margin-top: 20px; text-align: center; border-radius: 12px; border: 2px solid #e0e7ff; background: #f8f9ff; font-size: 1.1em; }
+.pass-input { 
+    width: 100%; 
+    padding: 14px; 
+    margin-top: 20px; 
+    text-align: center; 
+    border-radius: 12px; 
+    border: 2px solid #e0e7ff; 
+    background: #f8f9ff; 
+    font-size: 1.5em; /* تكبير الخط قليلاً للأرقام */
+    font-weight: bold;
+    letter-spacing: 2px;
+    color: #667eea;
+}
 .pass-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
 .pass-err { margin-top: 12px; color: #c62828; display: none; }
+
+/* الحاوية الرئيسية */
 .container { width: 100%; max-width: 420px; background: #fff; color: #222; padding: 26px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: fade 0.5s ease; }
 @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 h2 { text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2em; font-weight: 900; margin-bottom: 10px; }
@@ -56,7 +72,9 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
 <div id="password-modal">
   <div class="pass-box">
     <h2 class="pass-title" style="font-size:1.5em; margin-bottom:10px;">النظام الانتخابي</h2>
-    <input type="password" id="password-input" class="pass-input" placeholder="ادخل كود الدخول (200200)">
+    
+    <input type="text" id="password-input" class="pass-input" placeholder="ادخل كود الدخول (200200)" autocomplete="off">
+    
     <button class="pass-btn" id="login-btn">دخول للنظام</button>
     <div id="pw-err" class="pass-err">كلمة السر غير صحيحة</div>
   </div>
@@ -123,14 +141,8 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
       document.getElementById("password-modal").classList.add("hidden");
       document.getElementById("main-container").classList.remove("hidden");
       
-      // --- [نظام الحضور الحي] ---
-      // 1. ننشئ مرجعاً جديداً في presence
       const myPresenceRef = push(ref(db, 'presence'));
-      
-      // 2. نخبر Firebase: "إذا انقطع الاتصال، احذف هذا المرجع"
       onDisconnect(myPresenceRef).remove();
-      
-      // 3. نسجل أننا متصلون الآن
       set(myPresenceRef, {
           online: true,
           timestamp: Date.now()
