@@ -2,178 +2,148 @@
 <html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8" />
-<title>لوحة الإحصائيات</title>
+<title>شاشة التحكم المركزية</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; }
   body {
-    background: #1a1a2e; /* خلفية داكنة احترافية للإحصائيات */
-    color: #fff;
-    min-height: 100vh;
+    margin: 0; padding: 0;
+    font-family: "Cairo", sans-serif;
+    background-color: #0f0f1a;
+    color: white;
+    height: 100vh;
     display: flex;
     flex-direction: column;
-    align-items: center;
     justify-content: center;
-    overflow: hidden;
+    align-items: center;
   }
 
+  /* Stats Card */
   .stats-card {
-    background: rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
     padding: 40px;
-    border-radius: 30px;
+    border-radius: 40px;
     text-align: center;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 0 40px rgba(102, 126, 234, 0.2);
+    box-shadow: 0 0 50px rgba(102, 126, 234, 0.15);
     width: 90%;
     max-width: 500px;
-    animation: float 6s ease-in-out infinite;
+    margin-bottom: 30px;
   }
 
-  @keyframes float {
-    0% { transform: translateY(0px); }
-    50% { transform: translateY(-20px); }
-    100% { transform: translateY(0px); }
-  }
-
-  h1 {
-    font-size: 1.5em;
-    margin-bottom: 20px;
-    color: #a0a0a0;
-  }
-
-  .counter-box {
-    font-size: 6em;
+  .number-display {
+    font-size: 6rem;
     font-weight: 900;
-    background: linear-gradient(135deg, #00c6ff 0%, #0072ff 100%);
+    background: linear-gradient(to bottom, #4facfe 0%, #00f2fe 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
+    line-height: 1;
     margin: 10px 0;
-    text-shadow: 0 10px 20px rgba(0,0,0,0.3);
-    transition: all 0.3s ease;
-  }
-  
-  .pulse {
-    animation: pulse-animation 0.5s ease-in-out;
   }
 
-  @keyframes pulse-animation {
-    0% { transform: scale(1); }
-    50% { transform: scale(1.2); }
-    100% { transform: scale(1); }
-  }
-
-  .sub-text {
-    font-size: 1.2em;
-    color: #fff;
-  }
-
-  /* Notification Toast */
-  .toast-container {
-    position: fixed;
-    top: 20px;
-    left: 20px;
-    z-index: 1000;
-  }
-
-  .toast {
+  /* Messaging Section */
+  .msg-card {
     background: #fff;
     color: #333;
-    padding: 15px 25px;
+    width: 90%;
+    max-width: 500px;
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+  }
+
+  h2 { margin: 0 0 15px 0; color: #4facfe; text-align: center; }
+
+  .msg-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 10px;
+    font-size: 1rem;
+    font-family: inherit;
+    box-sizing: border-box;
     margin-bottom: 10px;
-    border-radius: 12px;
-    border-left: 5px solid #0072ff;
-    box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    display: flex;
-    align-items: center;
-    gap: 10px;
+  }
+  
+  .send-btn {
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #ff9800 0%, #ff5722 100%);
+    color: white;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.1rem;
     font-weight: bold;
-    animation: slideIn 0.5s ease forwards, fadeOut 0.5s ease 4s forwards;
-    min-width: 250px;
-  }
-
-  @keyframes slideIn {
-    from { transform: translateX(-100%); opacity: 0; }
-    to { transform: translateX(0); opacity: 1; }
-  }
-  @keyframes fadeOut {
-    to { opacity: 0; transform: translateY(-20px); }
-  }
-
-  .reset-btn {
-    margin-top: 30px;
-    background: rgba(255,255,255,0.1);
-    border: 1px solid rgba(255,255,255,0.3);
-    color: #aaa;
-    padding: 8px 16px;
-    border-radius: 8px;
     cursor: pointer;
     transition: 0.3s;
   }
-  .reset-btn:hover { background: rgba(255,255,255,0.2); color: #fff; }
+  .send-btn:hover { transform: scale(1.02); }
+  .send-btn:active { transform: scale(0.98); }
 
+  .status-text { margin-top: 10px; text-align: center; font-size: 0.9em; color: green; display: none; }
 </style>
 </head>
 <body>
 
-<div class="toast-container" id="toast-container"></div>
-
 <div class="stats-card">
-  <h1>عدد المتواجدين (المسجلين دخول)</h1>
-  <div class="counter-box" id="counter">0</div>
-  <div class="sub-text">مستخدم نشط الآن</div>
-  
-  <button class="reset-btn" onclick="resetCounter()">تصفير العداد</button>
+  <div style="font-size: 1.2rem; color: #ccc;">إجمالي عمليات الدخول للنظام</div>
+  <div class="number-display" id="count-display">0</div>
+  <div style="font-size: 0.9rem; color: #666;">يتم التحديث مباشرة عبر Firebase 🔥</div>
 </div>
 
-<script>
-  // قراءة العدد الحالي عند فتح الصفحة
-  let count = parseInt(localStorage.getItem("users_count") || "0");
-  const counterEl = document.getElementById("counter");
-  counterEl.innerText = count;
+<div class="msg-card">
+  <h2>📢 إرسال تنبيه للمستخدمين</h2>
+  <input type="text" id="msg-input" class="msg-input" placeholder="اكتب الرسالة هنا (مثلاً: انتبهوا للوقت المتبقي)">
+  <button class="send-btn" id="send-btn">إرسال الرسالة فوراً 🚀</button>
+  <div class="status-text" id="status-msg">تم الإرسال بنجاح!</div>
+</div>
 
-  // الاستماع لأي تغيير في localStorage (يحدث عند دخول شخص في الصفحة الأولى)
-  window.addEventListener('storage', (e) => {
-    if (e.key === 'new_login_event') {
-      // زيادة العداد
-      count = parseInt(localStorage.getItem("users_count") || "0");
-      updateDisplay();
-      showNotification();
-    }
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+  import { getDatabase, ref, onValue, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyAoZE2KL3APojd929VEbhSv914jzDv90wA",
+    authDomain: "test-dd8b4.firebaseapp.com",
+    databaseURL: "https://test-dd8b4-default-rtdb.firebaseio.com",
+    projectId: "test-dd8b4",
+    storageBucket: "test-dd8b4.firebasestorage.app",
+    messagingSenderId: "761689441004",
+    appId: "1:761689441004:web:667a3fae42f3cf84071bc9",
+    measurementId: "G-PP1BG203MT"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const db = getDatabase(app);
+
+  // 1. الاستماع لعدد المسجلين
+  const countRef = ref(db, 'stats/logins');
+  onValue(countRef, (snapshot) => {
+    const val = snapshot.val() || 0;
+    document.getElementById("count-display").innerText = val;
   });
 
-  function updateDisplay() {
-    counterEl.innerText = count;
-    // تأثير نبض عند تغير الرقم
-    counterEl.classList.remove("pulse");
-    void counterEl.offsetWidth; // trigger reflow
-    counterEl.classList.add("pulse");
-  }
+  // 2. إرسال الرسالة
+  document.getElementById("send-btn").addEventListener("click", () => {
+    const input = document.getElementById("msg-input");
+    const msg = input.value.trim();
+    
+    if (!msg) return alert("اكتب رسالة أولاً");
 
-  function showNotification() {
-    const container = document.getElementById("toast-container");
-    const toast = document.createElement("div");
-    toast.className = "toast";
-    toast.innerHTML = `
-      <span style="font-size:1.2em">🔔</span>
-      <div>
-        <div>دخول جديد!</div>
-        <div style="font-size:0.8em; color:#666">تم تسجيل مستخدم بالرقم السري</div>
-      </div>
-    `;
-    container.appendChild(toast);
+    // نكتب في مكان 'broadcast_message' ونضع طابع زمني لضمان تغير القيمة
+    set(ref(db, 'broadcast_message'), {
+      text: msg,
+      timestamp: Date.now()
+    }).then(() => {
+      // نجاح الإرسال
+      input.value = "";
+      const status = document.getElementById("status-msg");
+      status.style.display = "block";
+      setTimeout(() => status.style.display = "none", 3000);
+    }).catch((err) => {
+      alert("خطأ في الإرسال: " + err.message);
+    });
+  });
 
-    // إزالة العنصر من DOM بعد انتهاء الانيميشن
-    setTimeout(() => {
-      toast.remove();
-    }, 4500);
-  }
-
-  function resetCounter() {
-    localStorage.setItem("users_count", "0");
-    count = 0;
-    updateDisplay();
-  }
 </script>
 
 </body>
