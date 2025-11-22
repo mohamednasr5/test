@@ -5,29 +5,28 @@
 <title>تسجيل التصويت - متصل</title>
 <meta name="viewport" content="width=device-width, initial-scale=1" />
 <style>
-/* نفس التنسيقات السابقة */
+/* نفس التنسيقات الأساسية */
 * { margin: 0; padding: 0; box-sizing: border-box; font-family: "Cairo", "Segoe UI", Tahoma, sans-serif; }
 body { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; display: flex; justify-content: center; align-items: center; padding: 20px; color: #fff; overflow-x: hidden; }
 .hidden { display: none !important; }
 
-/* Password Modal */
+/* شاشة كلمة السر */
 #password-modal { position: fixed; inset: 0; background: rgba(0, 0, 0, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 9999; }
 .pass-box { width: 95%; max-width: 400px; background: #fff; color: #222; padding: 35px 18px; border-radius: 18px; text-align: center; }
 .pass-input { width: 100%; padding: 14px; margin-top: 20px; text-align: center; border-radius: 12px; border: 2px solid #e0e7ff; background: #f8f9ff; font-size: 1.1em; }
 .pass-btn { margin-top: 20px; width: 100%; padding: 13px; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; border: none; border-radius: 12px; font-weight: bold; cursor: pointer; }
 .pass-err { margin-top: 12px; color: #c62828; display: none; }
 
-/* Main Container */
+/* الحاوية الرئيسية */
 .container { width: 100%; max-width: 420px; background: #fff; color: #222; padding: 26px; border-radius: 20px; box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3); animation: fade 0.5s ease; }
 @keyframes fade { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
 h2 { text-align: center; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-size: 2em; font-weight: 900; margin-bottom: 10px; }
 
-/* Form Elements */
+/* عناصر النموذج */
 .committee-info { text-align: center; margin: 12px 0 25px; background: #f5f7ff; padding: 12px; border-radius: 12px; border-left: 4px solid #667eea; }
 label { font-weight: 700; color: #333; margin-top: 16px; display: block; }
 input[type="text"] { width: 100%; padding: 13px 12px; border-radius: 12px; border: 2px solid #e0e7ff; background: #f8f9ff; margin-top: 8px; }
 
-/* Candidate List & Radio */
 .candidate-list { margin-top: 10px; background: #f8f9ff; border: 2px solid #e0e7ff; border-radius: 14px; max-height: 320px; overflow-y: auto; padding: 8px; }
 .candidate-item { background: #fff; border: 1px solid #e8ecff; padding: 10px; margin-bottom: 9px; display: flex; justify-content: space-between; align-items: center; border-radius: 12px; cursor: pointer; border-left: 4px solid #667eea; transition:0.3s;}
 .candidate-item.selected { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
@@ -35,27 +34,40 @@ input[type="text"] { width: 100%; padding: 13px 12px; border-radius: 12px; borde
 .radio-item { display: flex; align-items: center; gap: 8px; cursor: pointer; padding: 8px; background: #fff; border-radius: 10px; border: 2px solid #e0e7ff; }
 .radio-item.selected { background: #667eea; color: #fff; }
 
-/* Buttons */
 .btn-row { display: flex; gap: 10px; margin-top: 23px; }
 button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: none; font-weight: bold; }
 .btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; }
 .btn-reset { background: #e0e7ff; color: #667eea; }
-
-/* Upload & Messages */
 .action-btn { width: 100%; margin-top: 15px; padding: 13px; background: linear-gradient(135deg, #4c28d3 0%, #7d45ff 100%); color: #fff; font-weight: 700; border-radius: 12px; border: none; cursor: pointer; }
 .msg-confirm { display: none; margin-top: 12px; padding: 11px; border-radius: 10px; text-align: center; font-weight: 700; background: #e8f5e9; color: #2e7d32; }
 
-/* Admin Message Popup */
+/* --- [تعديل] تصميم الرسالة المنبثقة (أسفل اليمين) --- */
 #admin-msg-popup {
-    position: fixed; top: 20px; left: 50%; transform: translateX(-50%);
-    background: #fff; border-left: 5px solid #ff9800; padding: 20px;
-    border-radius: 10px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-    z-index: 10000; display: flex; align-items: center; gap: 15px;
-    min-width: 300px; animation: slideDown 0.5s ease;
+    position: fixed; 
+    bottom: 20px; /* أسفل */
+    right: 20px;  /* يمين */
+    background: #fff; 
+    border-right: 6px solid #ff9800; /* الخط الملون يمين */
+    padding: 15px 20px;
+    border-radius: 12px; 
+    box-shadow: 0 10px 40px rgba(0,0,0,0.4);
+    z-index: 10000; 
+    display: flex; 
+    align-items: flex-start; 
+    gap: 15px;
+    min-width: 320px; 
+    max-width: 90vw;
+    animation: slideUp 0.6s cubic-bezier(0.16, 1, 0.3, 1);
 }
-@keyframes slideDown { from {top: -100px;} to {top: 20px;} }
-.admin-msg-content { color: #333; font-weight: bold; }
-.close-popup { cursor: pointer; color: #999; font-size: 1.2em; margin-right: auto; }
+
+@keyframes slideUp { 
+    from { bottom: -150px; opacity: 0; } 
+    to { bottom: 20px; opacity: 1; } 
+}
+
+.admin-msg-content { color: #333; font-weight: bold; line-height: 1.5; font-size: 1.05em; margin-top: 5px; }
+.close-popup { cursor: pointer; color: #aaa; font-size: 1.4em; margin-right: auto; transition: 0.3s; }
+.close-popup:hover { color: #ff9800; }
 
 /* معاينة الصورة */
 #preview-container { margin-top: 15px; display: none; text-align: center; }
@@ -65,9 +77,9 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
 <body>
 
 <div id="admin-msg-popup" class="hidden">
-    <div style="font-size: 2em;">📢</div>
-    <div>
-        <div style="font-size: 0.8em; color: #ff9800; font-weight: bold;">رسالة من الإدارة</div>
+    <div style="font-size: 2.2em;">🔔</div>
+    <div style="flex:1;">
+        <div style="font-size: 0.85em; color: #888; font-weight: bold; margin-bottom: 2px;">تنبيه من الإدارة</div>
         <div class="admin-msg-content" id="admin-msg-text"></div>
     </div>
     <div class="close-popup" onclick="document.getElementById('admin-msg-popup').classList.add('hidden')">✕</div>
@@ -118,7 +130,6 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
 </div>
 
 <script type="module">
-  // استيراد Firebase من CDN
   import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
   import { getDatabase, ref, set, onValue, runTransaction, push } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
@@ -136,7 +147,6 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // منطق تسجيل الدخول
   document.getElementById("login-btn").addEventListener("click", checkPass);
   
   function checkPass() {
@@ -144,16 +154,9 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
     if (val === "200200") {
       document.getElementById("password-modal").classList.add("hidden");
       document.getElementById("main-container").classList.remove("hidden");
-      
-      // زيادة عداد الدخول في قاعدة البيانات
       const statsRef = ref(db, 'stats/logins');
-      runTransaction(statsRef, (currentVal) => {
-        return (currentVal || 0) + 1;
-      });
-
-      // الاستماع للرسائل القادمة من صفحة الإحصائيات
+      runTransaction(statsRef, (c) => (c || 0) + 1);
       setupMessageListener();
-
     } else {
       const err = document.getElementById("pw-err");
       err.style.display = "block";
@@ -161,35 +164,22 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
     }
   }
 
-  // دالة الاستماع للرسائل
   function setupMessageListener() {
     const msgRef = ref(db, 'broadcast_message');
     let firstLoad = true;
-
     onValue(msgRef, (snapshot) => {
-      // تجاهل الرسالة القديمة الموجودة بالفعل عند تحميل الصفحة لأول مرة
-      if (firstLoad) {
-        firstLoad = false;
-        return;
-      }
-
+      if (firstLoad) { firstLoad = false; return; }
       const data = snapshot.val();
       if (data && data.text) {
-        // عرض الرسالة
         const popup = document.getElementById("admin-msg-popup");
-        const txt = document.getElementById("admin-msg-text");
-        txt.textContent = data.text;
+        document.getElementById("admin-msg-text").textContent = data.text;
         popup.classList.remove("hidden");
-        
-        // إخفاء تلقائي بعد 10 ثواني
-        setTimeout(() => popup.classList.add("hidden"), 10000);
+        // إخفاء تلقائي بعد 15 ثانية
+        setTimeout(() => popup.classList.add("hidden"), 15000);
       }
     });
   }
 
-  // --- دوال الواجهة (مثل القوائم والأزرار) ---
-  // (نفس الكود السابق للواجهة ليعمل مع Firebase)
-  
   const candidates = [
     ["1", "ايهاب العمده", "👑"], ["2", "محمد العتمانى", "🍞"], ["3", "أحمد الحديدى", "🦁"],
     ["4", "عادل الجيار", "🦅"], ["5", "احمد محمد محمد سمره", "💣"], ["6", "وليد تيسير الامير", "🐊"],
@@ -203,13 +193,11 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
     const item = document.createElement("div");
     item.className = "candidate-item";
     item.innerHTML = `<div style="display:flex; gap:10px; align-items:center"><div style="width:30px; height:30px; background:#667eea; color:#fff; border-radius:50%; display:flex; justify-content:center; align-items:center;">${c[0]}</div><b>${c[1]}</b></div><span style="font-size:1.5em">${c[2]}</span>`;
-    
     const checkbox = document.createElement("input");
     checkbox.type = "checkbox";
     checkbox.value = c[1];
     checkbox.className = "candidate-checkbox";
     checkbox.style.marginLeft = "10px";
-    
     item.appendChild(checkbox);
     item.onclick = (e) => { if(e.target !== checkbox) checkbox.click(); };
     checkbox.onchange = updateStyle;
@@ -221,7 +209,6 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
       const cb = el.querySelector("input");
       if(cb.checked) el.classList.add("selected"); else el.classList.remove("selected");
     });
-    // Limit to 2
     const checked = document.querySelectorAll(".candidate-checkbox:checked");
     if(checked.length > 2) {
         checked[checked.length-1].checked = false;
@@ -229,15 +216,13 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
         updateStyle();
     }
   }
-  window.updateStyle = updateStyle; // Make global for reset button
-
+  window.updateStyle = updateStyle;
   window.resetStyle = function() {
       setTimeout(updateStyle, 50);
       document.querySelectorAll(".radio-item").forEach(r => r.classList.remove("selected"));
       resetUploadButton();
   }
 
-  // Radio styling
   document.querySelectorAll("input[type='radio']").forEach(r => {
       r.addEventListener("change", function() {
           document.querySelectorAll(".radio-item").forEach(x => x.classList.remove("selected"));
@@ -245,18 +230,15 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
       });
   });
 
-  // Vote Submit (Simulated + Firebase)
   document.getElementById("vote-form").onsubmit = function(e) {
       e.preventDefault();
       const sel = document.querySelectorAll(".candidate-checkbox:checked");
       const val = document.querySelector("input[name='vvalid']:checked");
       if(sel.length !== 2) return alert("اختر مرشحين اثنين");
       if(!val) return alert("اختر حالة الصوت");
-
       const confirmMsg = document.getElementById("msg-confirm");
       confirmMsg.innerText = "تم إرسال الصوت للقاعدة بنجاح ✅";
       confirmMsg.style.display = "block";
-      
       setTimeout(() => {
           confirmMsg.style.display = "none";
           this.reset();
@@ -264,7 +246,6 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
       }, 2000);
   };
 
-  // Upload Logic (Global Functions)
   window.handleFileUpload = function(input) {
     if (input.files && input.files[0]) {
         const btn = document.getElementById("upload-btn");
@@ -281,14 +262,12 @@ button { flex: 1; padding: 13px; border-radius: 12px; cursor: pointer; border: n
         }, 1500);
     }
   }
-
   function resetUploadButton() {
       const btn = document.getElementById("upload-btn");
       btn.style.background = "linear-gradient(135deg, #4c28d3 0%, #7d45ff 100%)";
       document.getElementById("upload-text").innerText = "رفع محضر اللجنة 📄";
       document.getElementById("preview-container").style.display = 'none';
   }
-
 </script>
 </body>
 </html>
