@@ -7,6 +7,39 @@
 <style>
   body { margin: 0; padding: 20px; font-family: "Cairo", sans-serif; background-color: #0f0f1a; color: white; min-height: 100vh; display: flex; flex-direction: column; align-items: center; }
   
+  /* --- تصميم قسم الباركود (جديد) --- */
+  .qr-section {
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      padding: 20px;
+      border-radius: 25px;
+      margin-bottom: 30px;
+      text-align: center;
+      box-shadow: 0 0 30px rgba(102, 126, 234, 0.1);
+      animation: fadeInDown 0.8s ease;
+  }
+  
+  .qr-title {
+      color: #fff;
+      font-weight: bold;
+      margin-bottom: 15px;
+      font-size: 1.1em;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      padding-bottom: 10px;
+      display: inline-block;
+  }
+
+  .qr-img {
+      width: 250px; /* حجم كبير */
+      height: 250px;
+      border-radius: 15px;
+      border: 5px solid #fff; /* إطار أبيض لضمان التباين */
+      box-shadow: 0 10px 20px rgba(0,0,0,0.3);
+      background-color: #fff;
+  }
+
+  @keyframes fadeInDown { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
+
   /* شبكة الإحصائيات */
   .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; width: 90%; max-width: 800px; margin-bottom: 25px; }
   
@@ -16,7 +49,6 @@
   .stat-title { font-size: 0.9em; color: #ccc; margin-bottom: 10px; font-weight: bold; }
   .stat-value { font-size: 3rem; font-weight: 900; line-height: 1; }
   
-  /* ألوان مميزة للأرقام */
   .color-online { background: linear-gradient(to bottom, #00f2fe 0%, #4facfe 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .color-total { background: linear-gradient(to bottom, #f093fb 0%, #f5576c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
   .color-valid { background: linear-gradient(to bottom, #43e97b 0%, #38f9d7 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -49,23 +81,26 @@
 </head>
 <body>
 
+<div class="qr-section">
+    <div class="qr-title">امسح الكود للدخول لصفحة التصويت 📱</div>
+    <img src="https://raw.githubusercontent.com/mohamednasr5/test/74daa60a86586d7d1b7f0215a0262a3761a0ba43/4.jpeg
+" alt="QR Code" class="qr-img">
+</div>
+
 <div class="stats-grid">
     <div class="stat-card">
         <div class="stat-title">المتواجدون الآن 🔴</div>
         <div class="stat-value color-online" id="online-count">0</div>
         <div style="font-size:0.7em; color:#666;">يتم التحديث لحظياً عند الخروج</div>
     </div>
-
     <div class="stat-card">
         <div class="stat-title">إجمالي الأصوات 🗳️</div>
         <div class="stat-value color-total" id="total-votes">0</div>
     </div>
-
     <div class="stat-card">
         <div class="stat-title">أصوات صحيحة ✅</div>
         <div class="stat-value color-valid" id="valid-votes">0</div>
     </div>
-
     <div class="stat-card">
         <div class="stat-title">أصوات باطلة ❌</div>
         <div class="stat-value color-invalid" id="invalid-votes">0</div>
@@ -124,39 +159,23 @@
   const app = initializeApp(firebaseConfig);
   const db = getDatabase(app);
 
-  // 1. حساب المتواجدين الآن (Online Users)
-  // نستمع للعقدة presence، وعدد الأطفال داخلها يمثل عدد المستخدمين المتصلين
   onValue(ref(db, 'presence'), (snap) => {
-    // snap.size يعيد عدد المفاتيح (المستخدمين) الموجودين حالياً
-    const count = snap.size; 
-    document.getElementById("online-count").innerText = count;
+    document.getElementById("online-count").innerText = snap.size;
   });
 
-  // 2. حساب إحصائيات التصويت (Total, Valid, Invalid)
   onValue(ref(db, 'votes'), (snap) => {
-      let total = 0;
-      let valid = 0;
-      let invalid = 0;
-
+      let total = 0; let valid = 0; let invalid = 0;
       snap.forEach((child) => {
           total++;
           const val = child.val();
-          if (val.status === "صحيح") {
-              valid++;
-          } else {
-              invalid++;
-          }
+          if (val.status === "صحيح") valid++; else invalid++;
       });
-
       document.getElementById("total-votes").innerText = total;
       document.getElementById("valid-votes").innerText = valid;
       document.getElementById("invalid-votes").innerText = invalid;
   });
 
-  // 3. إرسال الرسائل
-  window.fillMsg = function(text) {
-      document.getElementById("msg-input").value = text;
-  }
+  window.fillMsg = function(text) { document.getElementById("msg-input").value = text; }
   document.getElementById("send-btn").addEventListener("click", () => {
     const input = document.getElementById("msg-input");
     if (!input.value.trim()) return;
@@ -166,38 +185,23 @@
     setTimeout(()=>document.getElementById("status-msg").style.display="none", 2000);
   });
 
-  // 4. سجل التصويت (Live Log)
   const votesRef = query(ref(db, 'votes'), limitToLast(50));
   const logBody = document.getElementById("log-body");
 
   onChildAdded(votesRef, (snapshot) => {
       const data = snapshot.val();
       if(!data) return;
-
       const row = document.createElement("tr");
       row.className = "log-row";
-      
       const timeStr = new Date(data.timestamp).toLocaleTimeString('ar-EG');
       const statusClass = data.status === "صحيح" ? "status-valid" : "status-invalid";
-      
       let candidatesHtml = "";
       if(data.candidates && Array.isArray(data.candidates)){
-          data.candidates.forEach(c => {
-              candidatesHtml += `<span class="candidate-pill">${c}</span>`;
-          });
+          data.candidates.forEach(c => { candidatesHtml += `<span class="candidate-pill">${c}</span>`; });
       }
-
-      row.innerHTML = `
-          <td>
-              <span style="font-weight:bold; display:block; color:#fff">${data.name}</span>
-              <span style="font-size:0.75em; color:#777">${timeStr}</span>
-          </td>
-          <td>${candidatesHtml}</td>
-          <td><span class="status-badge ${statusClass}">${data.status}</span></td>
-      `;
+      row.innerHTML = `<td><span style="font-weight:bold; display:block; color:#fff">${data.name}</span><span style="font-size:0.75em; color:#777">${timeStr}</span></td><td>${candidatesHtml}</td><td><span class="status-badge ${statusClass}">${data.status}</span></td>`;
       logBody.prepend(row);
   });
 </script>
-
 </body>
 </html>
