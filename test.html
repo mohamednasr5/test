@@ -1,324 +1,1646 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-<meta charset="UTF-8" />
-<title>شاشة التحكم المركزية | Dashboard</title>
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
-<link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;800&display=swap" rel="stylesheet">
-
+<meta charset="UTF-8">
+<title>لوحة التحكم الانتخابية</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
-    :root {
-        --primary-bg: #0f0f1a;
-        --card-bg: rgba(255, 255, 255, 0.03);
-        --glass-border: rgba(255, 255, 255, 0.08);
-        --accent-color: #4facfe;
-        --success-color: #43e97b;
-        --danger-color: #ff576c;
-        --neon-glow: 0 0 20px rgba(79, 172, 254, 0.3);
-    }
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Cairo", sans-serif;
+}
 
-    * { box-sizing: border-box; outline: none; }
+body {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #222;
+  min-height: 100vh;
+}
 
-    body {
-        margin: 0;
-        padding: 20px;
-        font-family: "Cairo", sans-serif;
-        background-color: var(--primary-bg);
-        background-image: 
-            radial-gradient(circle at 10% 20%, rgba(79, 172, 254, 0.1) 0%, transparent 20%),
-            radial-gradient(circle at 90% 80%, rgba(255, 87, 108, 0.08) 0%, transparent 20%);
-        color: white;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-        overflow-x: hidden;
-    }
+#lock-screen {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(10px);
+  z-index: 9999;
+}
 
-    ::-webkit-scrollbar { width: 8px; }
-    ::-webkit-scrollbar-track { background: #0f0f1a; }
-    ::-webkit-scrollbar-thumb { background: #333; border-radius: 4px; }
+.lock-box {
+  background: #fff;
+  width: 90%;
+  max-width: 400px;
+  padding: 40px 30px;
+  border-radius: 20px;
+  text-align: center;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.4s ease;
+}
 
-    /* --- QR Section --- */
-    .qr-section {
-        background: rgba(255, 255, 255, 0.05);
-        backdrop-filter: blur(10px);
-        border: 1px solid var(--glass-border);
-        padding: 25px;
-        border-radius: 25px;
-        margin-bottom: 35px;
-        text-align: center;
-        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-        animation: floatDown 1s ease-out;
-        max-width: 95%;
-        width: 400px;
-        position: relative;
-        overflow: hidden;
-    }
-    .qr-section::before {
-        content: ''; position: absolute; top: 0; left: -100%; width: 50%; height: 100%;
-        background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
-        transform: skewX(-25deg); animation: shine 3s infinite;
-    }
-    .qr-title { color: #fff; font-weight: 700; margin-bottom: 20px; font-size: 1.2em; }
-    .qr-img {
-        width: 200px; height: 200px; border-radius: 15px; border: 4px solid rgba(255,255,255,0.8);
-        padding: 5px; background: #fff; box-shadow: var(--neon-glow); transition: transform 0.3s ease;
-    }
-    .qr-img:hover { transform: scale(1.05); }
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(40px); }
+  to { opacity: 1; transform: translateY(0); }
+}
 
-    /* --- Stats Grid --- */
-    .stats-grid {
-        display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
-        gap: 20px; width: 100%; max-width: 900px; margin-bottom: 30px; padding: 0 10px;
-    }
-    .stat-card {
-        background: var(--card-bg); backdrop-filter: blur(8px); border: 1px solid var(--glass-border);
-        padding: 20px; border-radius: 20px; text-align: center; position: relative;
-        overflow: hidden; transition: 0.3s; animation: fadeInUp 0.8s ease backwards;
-    }
-    .stat-card:nth-child(1) { animation-delay: 0.1s; border-bottom: 3px solid #00f2fe; }
-    .stat-card:nth-child(2) { animation-delay: 0.2s; border-bottom: 3px solid #f093fb; }
-    .stat-card:nth-child(3) { animation-delay: 0.3s; border-bottom: 3px solid #43e97b; }
-    .stat-card:nth-child(4) { animation-delay: 0.4s; border-bottom: 3px solid #ff576c; }
-    .stat-card:hover { transform: translateY(-10px); background: rgba(255,255,255,0.07); }
-    .stat-title { font-size: 0.85em; color: #aaa; margin-bottom: 10px; font-weight: 600; }
-    .stat-value { font-size: 2.5rem; font-weight: 800; line-height: 1.1; }
-    
-    .color-online { background: linear-gradient(to bottom, #00f2fe, #4facfe); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .color-total { background: linear-gradient(to bottom, #f093fb, #f5576c); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .color-valid { background: linear-gradient(to bottom, #43e97b, #38f9d7); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-    .color-invalid { background: linear-gradient(to bottom, #ff0844, #ffb199); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.lock-box h2 {
+  color: #667eea;
+  margin-bottom: 10px;
+  font-size: 1.8em;
+}
 
-    /* --- Msg Card --- */
-    .msg-card {
-        background: #fff; color: #333; width: 95%; max-width: 700px; padding: 25px;
-        border-radius: 24px; box-shadow: 0 20px 50px rgba(0,0,0,0.4); margin-bottom: 30px;
-        position: relative; z-index: 2; animation: zoomIn 0.6s ease;
-    }
-    .msg-input {
-        width: 100%; padding: 15px; border: 2px solid #f0f0f0; border-radius: 12px;
-        font-size: 1rem; font-family: inherit; background: #fafafa; margin-bottom: 15px;
-    }
-    .msg-input:focus { border-color: var(--accent-color); background: #fff; }
-    .send-btn {
-        width: 100%; padding: 15px; background: linear-gradient(135deg, #ff9966 0%, #ff5e62 100%);
-        color: white; border: none; border-radius: 12px; font-size: 1.1rem; font-weight: bold;
-        cursor: pointer; transition: 0.3s;
-    }
-    .send-btn:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(255, 94, 98, 0.6); }
-    
-    .quick-replies { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 20px; border-top: 1px solid #f0f0f0; padding-top: 15px; }
-    .template-btn {
-        background: #f7f9fc; border: 1px solid #eef; padding: 8px 15px; border-radius: 20px;
-        cursor: pointer; transition: 0.2s; font-size: 0.85em; flex: 1 1 auto; display: flex; align-items: center; justify-content: center; gap: 6px;
-    }
-    .template-btn:hover { background: #eef4ff; color: var(--accent-color); border-color: var(--accent-color); }
+.lock-box p {
+  font-size: 0.95em;
+  color: #666;
+  margin-bottom: 30px;
+}
 
-    /* --- Danger Zone (New) --- */
-    .danger-card {
-        background: rgba(255, 0, 0, 0.05); border: 1px solid rgba(255, 0, 0, 0.2);
-        width: 95%; max-width: 700px; padding: 15px; border-radius: 15px; margin-bottom: 30px;
-        display: flex; justify-content: space-between; align-items: center;
-        backdrop-filter: blur(5px);
-    }
-    .danger-text { font-size: 0.9em; color: #ffb199; display: flex; align-items: center; gap: 10px; }
-    .reset-btn {
-        background: linear-gradient(135deg, #cb2d3e 0%, #ef473a 100%);
-        color: white; border: none; padding: 10px 20px; border-radius: 10px;
-        font-weight: bold; cursor: pointer; box-shadow: 0 4px 15px rgba(239, 71, 58, 0.3);
-        transition: 0.3s; font-size: 0.9em;
-    }
-    .reset-btn:hover { transform: scale(1.05); box-shadow: 0 6px 20px rgba(239, 71, 58, 0.5); }
+.lock-row {
+  margin-bottom: 15px;
+  position: relative;
+}
 
-    /* --- Log Table --- */
-    .log-container {
-        width: 95%; max-width: 900px; background: rgba(20, 20, 30, 0.6); backdrop-filter: blur(15px);
-        border-radius: 20px; border: 1px solid var(--glass-border); overflow: hidden;
-        box-shadow: 0 10px 40px rgba(0,0,0,0.3); animation: fadeInUp 1s ease;
-    }
-    .table-wrapper { width: 100%; overflow-x: auto; max-height: 400px; overflow-y: auto; }
-    .log-table { width: 100%; border-collapse: collapse; font-size: 0.95em; min-width: 600px; }
-    .log-table th { text-align: right; padding: 15px; background: rgba(0,0,0,0.3); color: #888; position: sticky; top: 0; backdrop-filter: blur(5px); }
-    .log-table td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #eee; }
-    .log-row { animation: slideInRight 0.4s ease-out; }
-    .status-badge { padding: 5px 12px; border-radius: 50px; font-weight: bold; font-size: 0.75em; }
-    .status-valid { background: rgba(67, 233, 123, 0.15); color: #43e97b; border: 1px solid rgba(67, 233, 123, 0.3); }
-    .status-invalid { background: rgba(255, 87, 108, 0.15); color: #ff576c; border: 1px solid rgba(255, 87, 108, 0.3); }
-    .candidate-pill { display: inline-block; background: rgba(255,255,255,0.1); padding: 4px 10px; border-radius: 8px; margin: 2px; font-size: 0.85em; }
+.lock-row input {
+  width: 100%;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 2px solid #e0e7ff;
+  background: #f8f9ff;
+  text-align: center;
+  font-size: 1.1em;
+  transition: all 0.3s ease;
+}
 
-    /* Keyframes */
-    @keyframes floatDown { from { opacity: 0; transform: translateY(-30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
-    @keyframes zoomIn { from { opacity: 0; transform: scale(0.9); } to { opacity: 1; transform: scale(1); } }
-    @keyframes slideInRight { from { opacity: 0; transform: translateX(20px); } to { opacity: 1; transform: translateX(0); } }
-    @keyframes shine { 0% { left: -100%; } 20% { left: 100%; } 100% { left: 100%; } }
+.lock-row input:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
 
-    /* Responsive */
-    @media (max-width: 600px) {
-        .stats-grid { grid-template-columns: 1fr 1fr; }
-        .danger-card { flex-direction: column; gap: 10px; text-align: center; }
-    }
-    @media (max-width: 400px) { .stats-grid { grid-template-columns: 1fr; } }
+.lock-toggle {
+  position: absolute;
+  left: 15px;
+  top: 50%;
+  transform: translateY(-50%);
+  cursor: pointer;
+  font-size: 1.3em;
+}
+
+.lock-box button {
+  margin-top: 20px;
+  width: 100%;
+  padding: 13px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.05em;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.lock-box button:hover {
+  transform: translateY(-2px);
+}
+
+.lock-error {
+  margin-top: 15px;
+  background: #ffebee;
+  color: #c62828;
+  padding: 10px;
+  font-weight: 700;
+  display: none;
+  border-radius: 10px;
+}
+
+.hidden { display: none !important; }
+
+.dashboard {
+  max-width: 1400px;
+  margin: auto;
+  padding: 25px;
+}
+
+.dash-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 30px;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
+.dash-title {
+  font-size: 2.2em;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.dash-subtitle {
+  font-size: 0.95em;
+  color: #999;
+}
+
+.admin-badge {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 8px 14px;
+  border-radius: 50px;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.9em;
+}
+
+.live-badge {
+  background: linear-gradient(135deg, #d4fc79 0%, #96f97b 100%);
+  padding: 10px 18px;
+  border-radius: 50px;
+  color: #2d5016;
+  font-weight: 700;
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.live-dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #2d5016;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+#spike-alert {
+  display: none;
+  background: linear-gradient(135deg, #ffd89b 0%, #19547b 100%);
+  padding: 15px;
+  color: #fff;
+  border-radius: 12px;
+  font-weight: 800;
+  text-align: center;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+}
+
+.card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 16px 48px rgba(102, 126, 234, 0.2);
+}
+
+.card-title {
+  font-size: 0.85em;
+  color: #999;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  font-weight: 600;
+}
+
+.card-value {
+  font-size: 2.2em;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-top: 10px;
+}
+
+.card-note {
+  font-size: 0.75em;
+  color: #bbb;
+  margin-top: 8px;
+}
+
+.committee-stats-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+}
+
+.committee-stats-card h3 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  font-weight: 900;
+}
+
+.committee-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 12px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.committee-item {
+  background: linear-gradient(135deg, #f5f7ff 0%, #eff2ff 100%);
+  padding: 15px;
+  border-radius: 12px;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border-left: 4px solid #667eea;
+}
+
+.committee-item:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: scale(1.05);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.committee-num {
+  font-size: 1.1em;
+  font-weight: 900;
+  margin-bottom: 8px;
+}
+
+.committee-name {
+  font-size: 0.85em;
+  font-weight: 700;
+  margin-bottom: 4px;
+  opacity: 0.9;
+}
+
+.committee-address {
+  font-size: 0.75em;
+  opacity: 0.8;
+  margin-bottom: 8px;
+}
+
+.committee-count {
+  font-size: 0.8em;
+  opacity: 0.8;
+}
+
+.notify-panel {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  margin-bottom: 25px;
+}
+
+.notify-panel h3 {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2em;
+  margin-bottom: 20px;
+  font-weight: 900;
+}
+
+.notify-option {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  margin-bottom: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+.notify-panel textarea {
+  width: 100%;
+  min-height: 100px;
+  padding: 14px;
+  background: #f8f9ff;
+  border: 2px solid #e0e7ff;
+  border-radius: 12px;
+  margin-bottom: 15px;
+  font-size: 1em;
+  resize: vertical;
+  transition: all 0.3s ease;
+  font-family: "Cairo", sans-serif;
+}
+
+.notify-panel textarea:focus {
+  outline: none;
+  border-color: #667eea;
+  box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+#notify-result {
+  display: none;
+  margin-top: 12px;
+  font-weight: 800;
+  font-size: 0.95em;
+  padding: 12px;
+  border-radius: 10px;
+}
+
+.charts-grid {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 20px;
+  margin-bottom: 25px;
+}
+
+.chart-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+  transition: all 0.3s ease;
+}
+
+.chart-card:hover {
+  box-shadow: 0 12px 40px rgba(102, 126, 234, 0.15);
+}
+
+.chart-card h3 {
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.05em;
+  font-weight: 900;
+}
+
+.chart-container {
+  position: relative;
+  height: 320px;
+}
+
+.ranking-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  margin-bottom: 25px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.ranking-card h3 {
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 1.2em;
+  font-weight: 900;
+}
+
+.ranking-list {
+  max-height: 500px;
+  overflow-y: auto;
+  padding: 5px;
+}
+
+.ranking-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  padding: 15px;
+  background: linear-gradient(135deg, #f5f7ff 0%, #eff2ff 100%);
+  border-radius: 12px;
+  transition: all 0.3s;
+  border-left: 4px solid #667eea;
+}
+
+.ranking-item:hover {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  transform: translateX(-5px);
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.3);
+}
+
+.ranking-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.ranking-medal {
+  font-size: 1.6em;
+  min-width: 35px;
+  text-align: center;
+}
+
+.ranking-name {
+  font-weight: 700;
+}
+
+.ranking-right {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.ranking-bar {
+  height: 28px;
+  border-radius: 14px;
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 0.85em;
+  font-weight: 700;
+  min-width: 80px;
+}
+
+.ranking-count {
+  font-weight: 900;
+  min-width: 45px;
+  text-align: center;
+}
+
+.table-card {
+  background: rgba(255, 255, 255, 0.95);
+  padding: 25px;
+  border-radius: 16px;
+  border: 1px solid rgba(102, 126, 234, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.08);
+}
+
+.table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 18px;
+}
+
+.search-input {
+  padding: 12px 16px;
+  border-radius: 12px;
+  border: 2px solid #e0e7ff;
+  background: #f8f9ff;
+  min-width: 220px;
+  font-size: 0.95em;
+  transition: all 0.3s ease;
+}
+
+.search-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
+.btn-sm {
+  padding: 11px 18px;
+  border: none;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9em;
+  transition: all 0.3s ease;
+}
+
+.btn-sm:hover {
+  transform: translateY(-2px);
+}
+
+.btn-export {
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%) !important;
+}
+
+.btn-reset-all {
+  background: linear-gradient(135deg, #eb3349 0%, #f45c43 100%) !important;
+}
+
+.btn-hidden {
+  display: none !important;
+}
+
+.table-wrap {
+  max-height: 450px;
+  overflow: auto;
+  border: 1px solid #e0e7ff;
+  border-radius: 12px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9em;
+}
+
+thead {
+  background: linear-gradient(135deg, #f5f7ff 0%, #eff2ff 100%);
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+th, td {
+  padding: 12px 14px;
+  border-bottom: 1px solid #e8ecff;
+}
+
+th {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  cursor: pointer;
+  font-weight: 900;
+  user-select: none;
+}
+
+tr:hover td {
+  background: rgba(102, 126, 234, 0.05);
+}
+
+.status-valid {
+  color: #11998e;
+  font-weight: 900;
+}
+
+.status-invalid {
+  color: #eb3349;
+  font-weight: 900;
+}
+
+.clickable-name {
+  text-decoration: underline;
+  cursor: pointer;
+  color: #667eea;
+}
+
+.vote-status-friend {
+  display: inline-block;
+  padding: 5px 10px;
+  background: linear-gradient(135deg, #d4fc79 0%, #96f97b 100%);
+  color: #2d5016;
+  border-radius: 8px;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+.vote-status-enemy {
+  display: inline-block;
+  padding: 5px 10px;
+  background: linear-gradient(135deg, #ffb347 0%, #ffcc99 100%);
+  color: #5c2e0f;
+  border-radius: 8px;
+  font-size: 0.8em;
+  font-weight: 700;
+}
+
+.btn-mini-edit {
+  padding: 6px 12px;
+  border-radius: 8px;
+  background: #667eea;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.8em;
+  transition: all 0.3s ease;
+}
+
+.btn-mini-edit:hover {
+  background: #764ba2;
+}
+
+.footer-note {
+  margin-top: 12px;
+  color: #999;
+  font-size: 0.85em;
+  font-weight: 600;
+}
+
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 9000;
+  backdrop-filter: blur(5px);
+}
+
+.overlay.hidden {
+  display: none !important;
+}
+
+.popup {
+  background: #fff;
+  width: 92%;
+  max-width: 500px;
+  border-radius: 16px;
+  padding: 25px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-height: 85vh;
+  overflow-y: auto;
+  animation: slideUp 0.3s ease;
+}
+
+.popup-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-weight: 900;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin-bottom: 18px;
+  font-size: 1.2em;
+}
+
+.popup-close {
+  background: none;
+  border: none;
+  font-size: 1.5em;
+  cursor: pointer;
+  color: #667eea;
+  transition: all 0.3s ease;
+}
+
+.popup-close:hover {
+  transform: scale(1.2);
+}
+
+.edit-list {
+  max-height: 280px;
+  overflow: auto;
+  border: 2px solid #e0e7ff;
+  border-radius: 12px;
+  padding: 12px;
+  background: #f8f9ff;
+}
+
+.edit-list label {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 8px 0;
+  font-weight: 700;
+  color: #333;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.edit-list label:hover {
+  background: #eff2ff;
+}
+
+.edit-list input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  accent-color: #667eea;
+  cursor: pointer;
+}
+
+@media(max-width: 900px) {
+  .charts-grid { grid-template-columns: 1fr; }
+  .committee-grid { grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); }
+  .dash-header { flex-direction: column; }
+}
+
+@media(max-width: 600px) {
+  .dashboard { padding: 15px; }
+  .dash-title { font-size: 1.6em; }
+  .committee-grid { grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); }
+  .table-header { flex-direction: column; align-items: flex-start; }
+  .search-input { min-width: 100%; }
+}
 </style>
 </head>
 <body>
 
-<div class="qr-section">
-    <div class="qr-title">📱 امسح الكود للتصويت</div>
-    <img src="https://raw.githubusercontent.com/mohamednasr5/test/74daa60a86586d7d1b7f0215a0262a3761a0ba43/4.jpeg" alt="QR Code" class="qr-img">
+<div id="lock-screen">
+  <div class="lock-box">
+    <h2>لوحة التحكم</h2>
+    <p>هذه الصفحة VIP للإدارة فقط</p>
+    <div class="lock-row">
+      <input id="lock-pass" type="password" placeholder="ادخل كلمة السر" autocomplete="off">
+      <span class="lock-toggle" onclick="toggleLockPass()">👁</span>
+    </div>
+    <button onclick="unlockDashboard()">دخول</button>
+    <div id="lock-error" class="lock-error"></div>
+  </div>
 </div>
 
-<div class="stats-grid">
-    <div class="stat-card">
-        <div class="stat-title">المتواجدون الآن 🔴</div>
-        <div class="stat-value color-online" id="online-count">0</div>
-        <div style="font-size:0.7em; color:rgba(255,255,255,0.5); margin-top:5px;">تحديث لحظي</div>
+<div id="dashboard" class="dashboard hidden">
+  <div class="dash-header">
+    <div>
+      <div class="dash-title">النتائج الإنتخابية | دائرة المنزلة والدقهلية</div>
+      <div class="dash-subtitle">متابعة مباشرة وتحليل شامل | النظام الأول من نوعه فى مصر</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-title">إجمالي الأصوات 🗳️</div>
-        <div class="stat-value color-total" id="total-votes">0</div>
+    <div style="display:flex;gap:10px;align-items:center;">
+      <div class="live-badge">
+        <span class="live-dot"></span>
+        <span id="live-status">بث مباشر</span>
+      </div>
+      <div id="admin-level-badge" class="admin-badge"></div>
     </div>
-    <div class="stat-card">
-        <div class="stat-title">أصوات صحيحة ✅</div>
-        <div class="stat-value color-valid" id="valid-votes">0</div>
+  </div>
+
+  <div id="spike-alert">تنبيه: قفزة عالية في الأصوات!</div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-title">إجمالي الناخبين في الدائرة</div>
+      <div id="total-original-voters" class="card-value">350757</div>
+      <div class="card-note">القاعدة الثابتة</div>
     </div>
-    <div class="stat-card">
-        <div class="stat-title">أصوات باطلة ❌</div>
-        <div class="stat-value color-invalid" id="invalid-votes">0</div>
+    <div class="card">
+      <div class="card-title">إجمالي الأصوات المسجلة</div>
+      <div id="total-votes" class="card-value">0</div>
+      <div class="card-note">جميع الأصوات المسجلة</div>
     </div>
+    <div class="card">
+      <div class="card-title">عدد الناخبين المتبقي</div>
+      <div id="remaining-voters" class="card-value">350757</div>
+      <div class="card-note">الإجمالي - المسجل</div>
+    </div>
+    <div class="card">
+      <div class="card-title">الأصوات الصحيحة</div>
+      <div id="valid-votes" class="card-value">0</div>
+      <div class="card-note">صحيح</div>
+    </div>
+    <div class="card">
+      <div class="card-title">الأصوات الباطلة</div>
+      <div id="invalid-votes" class="card-value">0</div>
+      <div class="card-note">باطل</div>
+    </div>
+    <div class="card">
+      <div class="card-title">متوسط أصوات/دقيقة</div>
+      <div id="vpm" class="card-value">0</div>
+      <div class="card-note">من البداية</div>
+    </div>
+    <div class="card">
+      <div class="card-title">آخر 10 دقائق</div>
+      <div id="vpm10" class="card-value">0</div>
+      <div class="card-note">السرعة الحالية</div>
+    </div>
+  </div>
+
+  <div class="committee-stats-card">
+    <h3>إحصائيات اللجان</h3>
+    <div id="committee-grid" class="committee-grid">
+      <div style="padding:20px;text-align:center;color:#999;grid-column:1/-1">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <div class="notify-panel">
+    <h3>إرسال رسالة مباشرة</h3>
+    <label class="notify-option">
+      <input type="radio" name="notify-target" value="all" checked>
+      <span>جميع اللجان</span>
+    </label>
+    <label class="notify-option">
+      <input type="radio" name="notify-target" value="one">
+      <span>لجنة رقم:
+        <input id="notify-committee" type="number" min="1" max="60" value="1" style="width:80px; padding:6px; border-radius:8px; border:2px solid #e0e7ff;">
+      </span>
+    </label>
+    <textarea id="notify-message" placeholder="اكتب الرسالة..."></textarea>
+    <button class="btn-sm" style="width:100%;margin-top:8px" onclick="sendNotification()">ارسال</button>
+    <div id="notify-result"></div>
+  </div>
+
+  <div class="charts-grid">
+    <div class="chart-card">
+      <h3>الأصوات لكل مرشح</h3>
+      <div class="chart-container">
+        <canvas id="chartCandidates"></canvas>
+      </div>
+    </div>
+    <div class="chart-card">
+      <h3>نسبة الصحيح والباطل</h3>
+      <div class="chart-container">
+        <canvas id="chartValidity"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="chart-card">
+    <h3>الأصوات لكل دقيقة</h3>
+    <div class="chart-container">
+      <canvas id="chartVPM"></canvas>
+    </div>
+  </div>
+
+  <div class="ranking-card">
+    <h3>ترتيب المرشحين</h3>
+    <div id="ranking-list" class="ranking-list">
+      <div style="padding:20px;text-align:center;color:#999">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <div class="table-card">
+    <div class="table-header">
+      <input id="search" class="search-input" placeholder="بحث...">
+      <div style="display:flex; gap:8px;">
+        <button class="btn-sm btn-export" onclick="exportCSV()">تصدير CSV</button>
+        <button id="btn-reset-all" class="btn-sm btn-reset-all" onclick="resetAll()">تصفير</button>
+      </div>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead>
+          <tr>
+            <th data-sort="index">#</th>
+            <th data-sort="name">الاسم</th>
+            <th data-sort="candidates">المرشحين</th>
+            <th data-sort="validity">الحالة</th>
+            <th>حالة الصوت</th>
+            <th data-sort="time">الوقت</th>
+            <th id="edit-col">تعديل</th>
+          </tr>
+        </thead>
+        <tbody id="votes-table"></tbody>
+      </table>
+    </div>
+    <div id="footer-note" class="footer-note">لا توجد بيانات</div>
+  </div>
 </div>
 
-<div class="msg-card">
-    <h2>📢 غرفة التحكم بالبث</h2>
-    <input type="text" id="msg-input" class="msg-input" placeholder="اكتب التنبيه هنا..." autocomplete="off">
-    <button class="send-btn" id="send-btn">إرسال للجميع 🚀</button>
-    <div style="display:none; text-align:center; color:#2ecc71; margin-top:10px; font-weight:bold;" id="status-msg">✨ تم الإرسال بنجاح</div>
-    
-    <div class="quick-replies">
-        <button class="template-btn" onclick="fillMsg('اهلا ومرحبا بكم فى مؤتمر دعم الحاج أحمد الحديدي')">👋 ترحيب بالمؤتمر</button>
-        <button class="template-btn" onclick="fillMsg('مرحبا بكم ياريت كلنا نهتم شوية ياجماعة بعد اذنكم')">⚠️ تنبيه هام</button>
-        <button class="template-btn" onclick="fillMsg('شكرا لتعبكم ودعمكم للحاج احمد الحديدي')">❤️ رسالة شكر</button>
+<div id="details-popup" class="overlay hidden">
+  <div class="popup">
+    <div class="popup-header">
+      <h3>تفاصيل الناخب</h3>
+      <button class="popup-close" onclick="closeDetails()">x</button>
     </div>
+    <div id="details-body" style="padding:10px;"></div>
+  </div>
 </div>
 
-<div class="danger-card">
-    <div class="danger-text">
-        <span>⚙️</span>
-        <span>إدارة البيانات (تحذير: لا يمكن التراجع)</span>
+<div id="committee-popup" class="overlay hidden">
+  <div class="popup">
+    <div class="popup-header">
+      <h3 id="committee-popup-title">تفاصيل اللجنة</h3>
+      <button class="popup-close" onclick="closeCommitteePopup()">x</button>
     </div>
-    <button class="reset-btn" id="reset-data-btn">🗑️ تصفير جميع الأصوات</button>
+    <div id="committee-popup-body" style="padding:10px;"></div>
+  </div>
 </div>
 
-<div class="log-container">
-    <h3 style="padding:20px; margin:0; border-bottom:1px solid rgba(255,255,255,0.1);">📋 سجل التصويت المباشر</h3>
-    <div class="table-wrapper">
-        <table class="log-table">
-            <thead>
-                <tr><th>الناخب / الوقت</th><th>الاختيارات</th><th>الحالة</th></tr>
-            </thead>
-            <tbody id="log-body"></tbody>
-        </table>
+<div id="edit-popup" class="overlay hidden">
+  <div class="popup">
+    <div class="popup-header">
+      <h3>تعديل المرشحين</h3>
+      <button class="popup-close" onclick="closeEdit()">x</button>
     </div>
+    <div style="padding:10px;">
+      <p id="edit-name" style="font-weight:700;margin-bottom:10px;"></p>
+      <div id="edit-candidates" class="edit-list"></div>
+      <button class="btn-sm" style="width:100%;margin-top:12px;" onclick="saveEdit()">حفظ</button>
+    </div>
+  </div>
 </div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.5.0/chart.umd.min.js"></script>
 
 <script type="module">
-  // إضافة remove للاستيراد
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
-  import { getDatabase, ref, onValue, set, query, limitToLast, onChildAdded, remove } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-  const firebaseConfig = {
-    apiKey: "AIzaSyAoZE2KL3APojd929VEbhSv914jzDv90wA",
-    authDomain: "test-dd8b4.firebaseapp.com",
-    databaseURL: "https://test-dd8b4-default-rtdb.firebaseio.com",
-    projectId: "test-dd8b4",
-    storageBucket: "test-dd8b4.firebasestorage.app",
-    messagingSenderId: "761689441004",
-    appId: "1:761689441004:web:667a3fae42f3cf84071bc9",
-    measurementId: "G-PP1BG203MT"
-  };
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-app.js";
+import { getDatabase, ref, onValue, update, remove, set } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-database.js";
 
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
+const firebaseConfig = {
+  apiKey: "AIzaSyCxxXV_6CEo1fTp3rRbfwfYbe7WH0Cyg38",
+  authDomain: "elahmadiya.firebaseapp.com",
+  databaseURL: "https://elahmadiya-default-rtdb.firebaseio.com",
+  projectId: "elahmadiya",
+  storageBucket: "elahmadiya.firebasestorage.app",
+  messagingSenderId: "594580767620",
+  appId: "1:594580767620:web:f5be3b87d4c704854e53d1"
+};
 
-  // كود تصفير البيانات
-  document.getElementById("reset-data-btn").addEventListener("click", () => {
-      // رسالة تأكيد
-      if (confirm("⚠️ تحذير هام!\n\nهل أنت متأكد أنك تريد حذف جميع الأصوات والسجلات؟\nلا يمكن التراجع عن هذه العملية!")) {
-          // كود الحذف الفعلي من فايربيز
-          remove(ref(db, 'votes'))
-            .then(() => {
-                alert("تم تصفير البيانات بنجاح! ✅");
-                // إعادة تحميل الصفحة لتنظيف الجدول بصرياً
-                location.reload();
-            })
-            .catch((error) => {
-                alert("حدث خطأ أثناء الحذف: " + error.message);
-            });
-      }
-  });
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-  onValue(ref(db, 'presence'), (snap) => {
-    document.getElementById("online-count").innerText = snap.size;
-  });
+let allVotes = [];
+let sortState = { key: "index", dir: "asc" };
+let chartCandidates = null;
+let chartValidity = null;
+let chartVPM = null;
+let adminLevel = 0;
 
-  onValue(ref(db, 'votes'), (snap) => {
-      let total = 0; let valid = 0; let invalid = 0;
-      snap.forEach((child) => {
-          total++;
-          const val = child.val();
-          if (val.status === "صحيح") valid++; else invalid++;
-      });
-      animateValue("total-votes", parseInt(document.getElementById("total-votes").innerText), total, 500);
-      animateValue("valid-votes", parseInt(document.getElementById("valid-votes").innerText), valid, 500);
-      animateValue("invalid-votes", parseInt(document.getElementById("invalid-votes").innerText), invalid, 500);
-  });
+const committeeData = {
+  1:  { name: "الفروسات", address: "مدرسة احمد القصبى الابتدائية" },
+  2:  { name: "الفروسات", address: "مدرسة احمد القصبى الابتدائية" },
+  3:  { name: "أبو الأخضر", address: "مدرسة أبو الأخضر الابتدائية" },
+  4:  { name: "جديدة المنزلة", address: "مدرسة الشهيد محمد فوزى" },
+  5:  { name: "العامرة", address: "مدرسة العامرة الابتدائية" },
+  6:  { name: "جديدة المنزلة", address: "مدرسة عبده بطي الإعدادية" },
+  7:  { name: "عرب زيدان", address: "مدرسة عرب زيدان الابتدائية" },
+  8:  { name: "الستايتة", address: "مدرسة الشهيد محمد زغلول الابتدائية" },
+  9:  { name: "كفر حجاج", address: "مدرسة كفر حجاج الابتدائية" },
+  10: { name: "ميت خض", address: "مدرسة محمد إسماعيل الإعدادية" },
+  11: { name: "المواجدة", address: "مدرسة حسني الشناوى" },
+  12: { name: "البضاط", address: "مدرسة الشهيد محمد المحلاوى الإعدادية" },
+  13: { name: "البضاط", address: "مدرسة الشهيد محمد المحلاوى الإعدادية" },
+  14: { name: "الطوابرة", address: "مدرسة النصر الإعدادية" },
+  15: { name: "العمارنة", address: "مدرسة العمارنة الابتدائية" },
+  16: { name: "أولاد بانا", address: "مدرسة أولاد بانا الابتدائية" },
+  17: { name: "أولاد حانا", address: "مدرسة أولاد حانا الابتدائية" },
+  18: { name: "القزاقزة", address: "مدرسة القزاقزة الابتدائية" },
+  19: { name: "الحوته", address: "مدرسة الشهيد اسلام محمد" },
+  20: { name: "أولاد نور", address: "مدرسة أولاد نور الابتدائية" },
+  21: { name: "الخلايفة", address: "مدرسة الشهيد محمود فهيم الابتدائية" },
+  22: { name: "القطشة", address: "مدرسة القطشة الإعدادية" },
+  23: { name: "الجماملة", address: "مدرسة الجماملة الابتدائية" },
+  24: { name: "العزيزة", address: "مدرسة مجمع العزيزة الابتدائية" },
+  25: { name: "العزيزة", address: "مدرسة مجمع العزيزة الابتدائية" },
+  26: { name: "الأحمدية", address: "مدرسة الاحمدية الابتدائية" },
+  27: { name: "العربان", address: "مدرسة طاهر فرح" },
+  28: { name: "أولاد علم", address: "مدرسة الشني سليم الابتدائية" },
+  29: { name: "أولاد ناصر", address: "مدرسة الدكتور محمد النحاس" },
+  30: { name: "ببر هلال", address: "مدرسة ببر هلال الابتدائية" },
+  31: { name: "الشبول", address: "معهد بني الشبول الأزهرى" },
+  32: { name: "الشبول", address: "معهد بني الشبول الأزهرى" },
+  33: { name: "الرودة", address: "مدرسة الرودة الإعدادية" },
+  34: { name: "ميت شريف", address: "مدرسة أم المؤمنين الابتدائية" },
+  35: { name: "بحر حادوث", address: "مدرسة السيد قطب الإعدادية" },
+  36: { name: "النسايمة", address: "مدرسة النسايمة الابتدائية" },
+  37: { name: "النسايمة", address: "مدرسة النسايمة الابتدائية" },
+  40: { name: "شارع محمد فريد", address: "معهد فتيات المطرية ع ث" },
+  41: { name: "شارع المينا القبلي", address: "مدرسة أبو بكر الصديق" },
+  42: { name: "شارع الدقهلية", address: "مدرسة أحمد ماهر الثانوية بنين" },
+  43: { name: "شارع الدقهلية", address: "مدرسة أحمد ماهر الثانوية بنين" },
+  44: { name: "شارع المينا البحري", address: "مدرسة العاشر من رمضان الابتدائية" },
+  45: { name: "شارع المينا البحري", address: "مدرسة طارق ابن زياد الأعدادية" },
+  46: { name: "قرية العصافرة", address: "مدرسة السيدة نفسية الاعدادية بنات" },
+  47: { name: "قرية العصافرة", address: "مدرسة السيدة نفسية الاعدادية بنات" },
+  48: { name: "قرية الضهير", address: "مدرسة الضهير الإبتدائية" },
+  49: { name: "شارع صلاح الدين", address: "معهد عثمان بن عفان الابتدائي" },
+  50: { name: "شارع الدقهلية", address: "مدرسة خالد بن الوليد" },
+  51: { name: "شارع الدقهلية", address: "مدرسة خالد بن الوليد" },
+  52: { name: "شارع المينا البحري", address: "مدرسة المطرية الابتدائية" },
+  53: { name: "شارع الثانوية", address: "مدرسة الثانوية بنين" },
+  54: { name: "شارع مصنع البصل", address: "مدرسة عثمان بن عفان الإعدادية" },
+  55: { name: "شارع مصنع البصل", address: "مدرسة عثمان بن عفان الإعدادية" },
+  56: { name: "شارع بورسعيد", address: "مدرسة الأنصاري الابتدائية" },
+  57: { name: "هاشم شلباية", address: "مدرسة هاشم شلباية خلف المستشفى" },
+  58: { name: "شارع الزهراء", address: "مدرسة الزهراء الابتدائية" },
+  59: { name: "شارع الزهراء", address: "مدرسة الزهراء الابتدائية" },
+  60: { name: "سوق الجمعة", address: "مدرسة الامام علي الابتدائية" },
+  38: { name: "شارع الثورة", address: "مدرسة الشهيد محمود النجدي الثانوية بنات" },
+  39: { name: "شارع الثورة", address: "مدرسة الشهيد محمود النجدي الثانوية بنات" }
+};
+  
+const originalVotersCount = {
+  1: 5929, 2: 5554, 3: 4617, 4: 9197, 5: 3519, 6: 3781,
+  7: 1848, 8: 2239, 9: 2689, 10: 2204, 11: 4891, 12: 9075,
+  13: 8966, 14: 4194, 15: 9886, 16: 1892, 17: 4334, 18: 2239,
+  19: 4400, 20: 2290, 21: 1904, 22: 2052, 23: 1868, 24: 10131,
+  25: 10191, 26: 4683, 27: 560, 28: 1342, 29: 1642, 30: 3328,
+  31: 6250, 32: 5863, 33: 5498, 34: 5498, 35: 9792, 36: 7021,
+  37: 6121, 38: 7446, 39: 7447, 40: 8538, 41: 7310, 42: 8793,
+  43: 8793, 44: 7721, 45: 7421, 46: 9704, 47: 9704, 48: 3119,
+  49: 8214, 50: 6247, 51: 6247, 52: 6600, 53: 10721, 54: 7871,
+  55: 8436, 56: 9689, 57: 10055, 58: 6975, 59: 5580, 60: 10989
+};
 
-  function animateValue(id, start, end, duration) {
-      if (start === end) return;
-      const obj = document.getElementById(id);
-      let startTimestamp = null;
-      const step = (timestamp) => {
-          if (!startTimestamp) startTimestamp = timestamp;
-          const progress = Math.min((timestamp - startTimestamp) / duration, 1);
-          obj.innerHTML = Math.floor(progress * (end - start) + start);
-          if (progress < 1) window.requestAnimationFrame(step); else obj.innerHTML = end;
-      };
-      window.requestAnimationFrame(step);
+const totalOriginalVoters = 350757;
+
+const candidatesNames = [
+  "ايهاب العمده","محمد العتمانى","أحمد الحديدى",
+  "عادل الجيار","احمد محمد محمد سمره","وليد تيسير الامير",
+  "كمال العيسوى","البدوى جميز","احمد الريس",
+  "أحمد عوف","حسن الملهاط","عمرو محمد بحيرى",
+  "السيد طمان","محمد دندن","مجدى الأمير"
+];
+
+window.toggleLockPass = function(){
+  const inp = document.getElementById("lock-pass");
+  inp.type = inp.type === "password" ? "text" : "password";
+};
+
+window.unlockDashboard = function(){
+  const value = document.getElementById("lock-pass").value.trim();
+  const err = document.getElementById("lock-error");
+  
+  if(value === "251988"){
+    adminLevel = 1;
+    document.getElementById("lock-screen").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("admin-level-badge").textContent = "🔑 مهندس محمد حماد";
+    showNotification("مرحبا بك يا مهندس محمد حماد - صلاحيات كاملة!");
+    setupVotesListener();
+  } 
+  else if(value === "451125"){
+    adminLevel = 2;
+    document.getElementById("lock-screen").classList.add("hidden");
+    document.getElementById("dashboard").classList.remove("hidden");
+    document.getElementById("admin-level-badge").textContent = "👁 مراقب";
+    showNotification("مرحبا بكم فى عالم التحكم الكامل والمراقبة");
+    
+    document.getElementById("btn-reset-all").classList.add("btn-hidden");
+    document.querySelectorAll(".btn-mini-edit").forEach(btn => btn.classList.add("btn-hidden"));
+    document.getElementById("edit-col").classList.add("hidden");
+
+    setupVotesListener();
+  } 
+  else {
+    err.textContent = "كلمة سر غير صحيحة";
+    err.style.display = "block";
+    setTimeout(() => err.style.display = "none", 2300);
   }
+};
 
-  window.fillMsg = function(text) { 
-      const input = document.getElementById("msg-input"); input.value = text; input.focus();
+document.getElementById("lock-pass").addEventListener("keydown", e => {
+  if(e.key === "Enter") unlockDashboard();
+});
+
+function showNotification(msg){
+  const box = document.createElement("div");
+  box.style.cssText = "position:fixed;bottom:20px;right:20px;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);color:#fff;padding:16px 20px;border-radius:12px;box-shadow:0 8px 24px rgba(0,0,0,.3);z-index:99999;font-size:1em;max-width:300px;";
+  box.innerText = msg;
+  document.body.appendChild(box);
+  setTimeout(() => box.remove(), 4000);
+}
+
+let votesListener = null;
+
+function setupVotesListener() {
+  if (votesListener) votesListener();
+
+  const votesRef = ref(db, "/");
+
+  votesListener = onValue(votesRef, snapshot => {
+    const root = snapshot.val() || {};
+    let combined = {};
+
+    if (root.votes) {
+      Object.entries(root.votes).forEach(([id, v]) => { combined[id] = v; });
+    }
+
+    if (root.aziza) {
+      Object.entries(root.aziza).forEach(([id, v]) => { combined[id] = v; });
+    }
+
+    allVotes = Object.entries(combined).map(([id, v], i) => ({
+      id,
+      index: i + 1,
+      name: v.name || "No Name",
+      candidates: Array.isArray(v.selected) ? v.selected : [],
+      validity: v.vote_validity || "",
+      timestamp: v.timestamp || 0,
+      committee: Number(v.committee) || 0
+    }));
+
+    renderAll();
+  });
+}
+
+function renderAll(){
+  renderStats();
+  renderCommitteeStats();
+  renderCharts();
+  renderRanking();
+  renderTable();
+}
+
+function renderStats(){
+  const total = allVotes.length;
+  const valid = allVotes.filter(v => v.validity === "صحيح").length;
+  const invalid = allVotes.filter(v => v.validity === "باطل").length;
+  const remaining = totalOriginalVoters - total;
+
+  document.getElementById("total-original-voters").textContent = totalOriginalVoters;
+  document.getElementById("total-votes").textContent = total;
+  document.getElementById("valid-votes").textContent = valid;
+  document.getElementById("invalid-votes").textContent = invalid;
+  document.getElementById("remaining-voters").textContent = remaining < 0 ? 0 : remaining;
+
+  const liveTxt = document.getElementById("live-status");
+  const now = Date.now();
+
+  if(total > 0){
+    const sorted = [...allVotes].filter(v => v.timestamp).sort((a, b) => a.timestamp - b.timestamp);
+    if(sorted.length === 0){
+      document.getElementById("vpm").textContent = "0";
+      document.getElementById("vpm10").textContent = "0";
+      liveTxt.textContent = "لا يوجد تصويت حالياً";
+      return;
+    }
+
+    const firstTs = sorted[0].timestamp;
+    const lastTs = sorted[sorted.length - 1].timestamp;
+    const diffMin = (lastTs - firstTs) / 60000;
+    let vpm = diffMin > 0 ? (total / diffMin) : 0;
+    document.getElementById("vpm").textContent = vpm.toFixed(2);
+
+    const tenMinAgo = now - (10 * 60 * 1000);
+    const last10 = allVotes.filter(v => v.timestamp >= tenMinAgo);
+    let vpm10 = 0;
+    if(last10.length > 0){
+      const firstInWindow = Math.min(...last10.map(x => x.timestamp));
+      const span = (now - firstInWindow) / 60000;
+      vpm10 = last10.length / (span || 1);
+    }
+    document.getElementById("vpm10").textContent = vpm10.toFixed(2);
+
+    if(now - lastTs < 25000) liveTxt.textContent = "نشاط عالي";
+    else liveTxt.textContent = "نشاط مستقر";
+
+    const lastMin = allVotes.filter(v => v.timestamp >= (now - 60000)).length;
+    if(total >= 5 && vpm10 > 0 && lastMin >= 3 && lastMin > (vpm10 * 2)){
+      document.getElementById("spike-alert").style.display = "block";
+    } else {
+      document.getElementById("spike-alert").style.display = "none";
+    }
+  } else {
+    document.getElementById("vpm").textContent = "0";
+    document.getElementById("vpm10").textContent = "0";
+    liveTxt.textContent = "لا يوجد تصويت حالياً";
+  }
+}
+
+function renderCommitteeStats(){
+  const grid = document.getElementById("committee-grid");
+  const commData = {};
+  
+  for(let i = 1; i <= 60; i++){
+    commData[i] = { 
+      original: originalVotersCount[i] || 0, 
+      total: 0, 
+      valid: 0, 
+      invalid: 0, 
+      votes: [], 
+      lastVoteValidity: null 
+    };
   }
   
-  document.getElementById("send-btn").addEventListener("click", () => {
-    const input = document.getElementById("msg-input");
-    if (!input.value.trim()) return;
-    set(ref(db, 'broadcast_message'), { text: input.value.trim(), timestamp: Date.now() });
-    input.value = "";
-    const status = document.getElementById("status-msg");
-    status.style.display = "block"; status.style.animation = "fadeInUp 0.5s ease";
-    setTimeout(()=> { status.style.display="none"; }, 3000);
+  allVotes.forEach(v => {
+    const comm = v.committee || 0;
+    if(comm >= 1 && comm <= 60){
+      commData[comm].total++;
+      commData[comm].votes.push(v);
+      if(v.validity === "صحيح") commData[comm].valid++;
+      if(v.validity === "باطل") commData[comm].invalid++;
+      commData[comm].lastVoteValidity = v.validity;
+    }
+  });
+  
+  grid.innerHTML = "";
+  for(let i = 1; i <= 60; i++){
+    const data = commData[i];
+    const info = committeeData[i] || { name: "لجنة", address: "بدون عنوان" };
+    const remaining = data.original - data.total;
+    const item = document.createElement("div");
+    item.className = "committee-item";
+    item.dataset.committee = i;
+    
+    if(data.lastVoteValidity === "صحيح"){
+      item.style.background = "linear-gradient(135deg, rgba(17, 153, 142, 0.15) 0%, rgba(150, 249, 123, 0.15) 100%)";
+      item.style.borderLeft = "4px solid #11998e";
+    } else if(data.lastVoteValidity === "باطل"){
+      item.style.background = "linear-gradient(135deg, rgba(235, 51, 73, 0.15) 0%, rgba(244, 92, 67, 0.15) 100%)";
+      item.style.borderLeft = "4px solid #eb3349";
+    } else {
+      item.style.background = "linear-gradient(135deg, #f5f7ff 0%, #eff2ff 100%)";
+      item.style.borderLeft = "4px solid #667eea";
+    }
+    
+    item.onclick = () => showCommitteeDetails(i, data);
+    item.innerHTML = "<div class='committee-num'>اللجنة " + i + "</div><div class='committee-name'>" + info.name + "</div><div class='committee-address'>" + info.address + "</div><div class='committee-count'>إجمالي: " + data.original + "</div><div class='committee-count'>المسجل: " + data.total + "</div><div class='committee-count'>المتبقي: " + (remaining < 0 ? 0 : remaining) + "</div>";
+    grid.appendChild(item);
+  }
+}
+
+window.showCommitteeDetails = function(num, data){
+  const popup = document.getElementById("committee-popup");
+  const title = document.getElementById("committee-popup-title");
+  const body = document.getElementById("committee-popup-body");
+  const info = committeeData[num] || { name: "لجنة", address: "بدون عنوان" };
+  const originalCount = data.original || 0;
+  const remaining = originalCount - data.total;
+  
+  title.textContent = info.name + " " + num;
+  
+  const ourVotes = data.votes.filter(v => v.candidates.includes("أحمد الحديدى")).length;
+  const theirVotes = data.total - ourVotes;
+  const percentage = data.total > 0 ? ((ourVotes / data.total) * 100).toFixed(1) : 0;
+  const now = Date.now();
+  
+  let vpm = 0;
+  const sorted = [...data.votes].filter(v => v.timestamp).sort((a, b) => a.timestamp - b.timestamp);
+  if(sorted.length > 0){
+    const firstTs = sorted[0].timestamp;
+    const lastTs = sorted[sorted.length - 1].timestamp;
+    const diffMin = (lastTs - firstTs) / 60000;
+    if(diffMin > 0) vpm = data.total / diffMin;
+  }
+  
+  let vpm10 = 0;
+  const tenMinAgo = now - (10 * 60 * 1000);
+  const last10 = data.votes.filter(v => v.timestamp >= tenMinAgo);
+  if(last10.length > 0){
+    const firstInWindow = Math.min(...last10.map(x => x.timestamp));
+    const span = (now - firstInWindow) / 60000;
+    vpm10 = last10.length / (span || 1);
+  }
+  
+  let html = "<div style='background:#f5f7ff;padding:15px;border-radius:12px;margin-bottom:15px;border-left:4px solid #667eea;'>";
+  html += "<div style='margin-bottom:8px;font-size:0.9em;color:#667eea;font-weight:700;'>" + info.address + "</div>";
+  html += "<div style='display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;'>";
+  html += "<div><small style='color:#999;font-weight:600;'>إجمالي الناخبين</small><div style='font-size:1.5em;font-weight:900;color:#667eea;'>" + originalCount + "</div></div>";
+  html += "<div><small style='color:#999;font-weight:600;'>الأصوات المسجلة</small><div style='font-size:1.5em;font-weight:900;color:#11998e;'>" + data.total + "</div></div>";
+  html += "<div><small style='color:#999;font-weight:600;'>المتبقي</small><div style='font-size:1.5em;font-weight:900;color:#eb3349;'>" + (remaining < 0 ? 0 : remaining) + "</div></div>";
+  html += "</div><div style='margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:10px;'>";
+  html += "<div><small style='color:#11998e;font-weight:600;'>أصوات صحيحة</small><div style='font-size:1.3em;font-weight:900;color:#11998e;'>" + data.valid + "</div></div>";
+  html += "<div><small style='color:#eb3349;font-weight:600;'>أصوات باطلة</small><div style='font-size:1.3em;font-weight:900;color:#eb3349;'>" + data.invalid + "</div></div></div></div>";
+  html += "<div style='background:#e8f5e9;padding:12px;border-radius:10px;margin-bottom:15px;border-left:4px solid #11998e;'>";
+  html += "<small style='color:#11998e;font-weight:600;'>متوسط الأصوات/دقيقة</small><div style='font-size:1.5em;font-weight:900;color:#11998e;'>" + vpm.toFixed(2) + "</div></div>";
+  html += "<div style='background:#fff3e0;padding:12px;border-radius:10px;margin-bottom:15px;border-left:4px solid #ff9800;'>";
+  html += "<small style='color:#e65100;font-weight:600;'>آخر 10 دقائق</small><div style='font-size:1.5em;font-weight:900;color:#e65100;'>" + vpm10.toFixed(2) + "</div></div>";
+  html += "<div style='background:#d4fc79;padding:12px;border-radius:10px;margin-bottom:15px;text-align:center;border-left:4px solid #2d5016;'>";
+  html += "<small style='color:#2d5016;font-weight:600;'>أصواتنا</small><div style='font-size:1.8em;font-weight:900;color:#2d5016;'>" + ourVotes + " (" + percentage + "%)</div></div>";
+  html += "<div style='background:#ffb347;padding:12px;border-radius:10px;margin-bottom:15px;text-align:center;border-left:4px solid #5c2e0f;'>";
+  html += "<small style='color:#5c2e0f;font-weight:600;'>أصوات أخرى</small><div style='font-size:1.8em;font-weight:900;color:#5c2e0f;'>" + theirVotes + "</div></div>";
+  
+  if(data.votes.length > 0){
+    html += "<h4 style='color:#667eea;margin:15px 0 10px 0;font-weight:900;'>الناخبين (" + data.votes.length + ")</h4>";
+    html += "<div style='max-height:300px;overflow-y:auto;'>";
+    data.votes.forEach((v, i) => {
+      const ourVote = v.candidates.includes("أحمد الحديدى");
+      const statusLabel = ourVote ? "تبعنا" : "مش تبعنا";
+      const validityIcon = v.validity === "صحيح" ? "✓" : "✗";
+      const bgColor = ourVote ? "rgba(212,252,121,0.2)" : "rgba(255,179,71,0.2)";
+      const borderColor = ourVote ? "#96f97b" : "#ffb347";
+      html += "<div style='padding:10px;margin-bottom:8px;background:" + bgColor + ";border-radius:10px;border-right:4px solid " + borderColor + ";'>";
+      html += "<div style='font-weight:700;color:#333;margin-bottom:4px;'>" + (i + 1) + ". " + v.name + "</div>";
+      html += "<div style='font-size:0.85em;color:#666;margin-bottom:4px;'>المرشحين: " + (v.candidates.join(" و ") || "—") + "</div>";
+      html += "<div style='display:flex;gap:8px;font-size:0.85em;'>";
+      html += "<span style='padding:3px 8px;background:" + (v.validity === "صحيح" ? "#c8e6c9" : "#ffccbc") + ";border-radius:6px;color:#333;font-weight:700;'>" + validityIcon + " " + v.validity + "</span>";
+      html += "<span style='padding:3px 8px;background:#e8f5e9;border-radius:6px;color:#333;'>" + statusLabel + "</span></div></div>";
+    });
+    html += "</div>";
+  } else {
+    html += "<p style='color:#999;text-align:center;padding:20px;background:#f5f7ff;border-radius:10px;'>لا توجد أصوات</p>";
+  }
+  
+  body.innerHTML = html;
+  popup.classList.remove("hidden");
+};
+
+window.closeCommitteePopup = function(){
+  document.getElementById("committee-popup").classList.add("hidden");
+};
+
+function renderCharts(){
+  const ctx1 = document.getElementById("chartCandidates");
+  const ctx2 = document.getElementById("chartValidity");
+  const ctx3 = document.getElementById("chartVPM");
+
+  if(!ctx1 || !ctx2 || !ctx3) return;
+
+  const counts = {};
+  allVotes.forEach(v => v.candidates.forEach(c => counts[c] = (counts[c] || 0) + 1));
+  const labels = Object.keys(counts).length > 0 ? Object.keys(counts) : ["لا توجد بيانات"];
+  const data = Object.keys(counts).length > 0 ? Object.values(counts) : [0];
+
+  if(chartCandidates){
+    chartCandidates.destroy();
+  }
+  chartCandidates = new Chart(ctx1.getContext("2d"), {
+    type: "bar",
+    data: { labels: labels, datasets: [{ label: "الأصوات", data: data, backgroundColor: "#667eea", borderRadius: 8 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true } } }
   });
 
-  const votesRef = query(ref(db, 'votes'), limitToLast(50));
-  const logBody = document.getElementById("log-body");
+  const valid = allVotes.filter(v => v.validity === "صحيح").length;
+  const invalid = allVotes.filter(v => v.validity === "باطل").length;
+  const total = valid + invalid;
 
-  onChildAdded(votesRef, (snapshot) => {
-      const data = snapshot.val();
-      if(!data) return;
-      const row = document.createElement("tr");
-      row.className = "log-row";
-      const timeStr = new Date(data.timestamp).toLocaleTimeString('ar-EG');
-      const statusClass = data.status === "صحيح" ? "status-valid" : "status-invalid";
-      let candidatesHtml = "";
-      if(data.candidates && Array.isArray(data.candidates)){
-          data.candidates.forEach(c => { candidatesHtml += `<span class="candidate-pill">${c}</span>`; });
-      } else { candidatesHtml = "<span style='opacity:0.5'>--</span>"; }
-      
-      row.innerHTML = `<td><div style="font-weight:bold; color:#fff;">${data.name}</div><div style="font-size:0.75em; color:#aaa;">🕒 ${timeStr}</div></td><td>${candidatesHtml}</td><td><span class="status-badge ${statusClass}">${data.status}</span></td>`;
-      logBody.prepend(row);
+  if(chartValidity){
+    chartValidity.destroy();
+  }
+  chartValidity = new Chart(ctx2.getContext("2d"), {
+    type: "doughnut",
+    data: { 
+      labels: ["صحيح (" + valid + ")", "باطل (" + invalid + ")"], 
+      datasets: [{ data: total > 0 ? [valid, invalid] : [0, 0], backgroundColor: ["#11998e", "#eb3349"] }] 
+    },
+    options: { responsive: true, maintainAspectRatio: false, cutout: "55%", plugins: { legend: { position: "bottom" } } }
   });
+
+  const minutes = {};
+  allVotes.forEach(v => {
+    if(!v.timestamp) return;
+    const key = Math.floor(v.timestamp / 60000) * 60000;
+    minutes[key] = (minutes[key] || 0) + 1;
+  });
+
+  const minuteKeys = Object.keys(minutes).map(Number).sort((a, b) => a - b);
+  const minuteLabels = minuteKeys.length > 0 ? minuteKeys.map(t => new Date(t).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit" })) : ["لا توجد"];
+  const minuteData = minuteKeys.length > 0 ? minuteKeys.map(k => minutes[k]) : [0];
+
+  if(chartVPM){
+    chartVPM.destroy();
+  }
+  chartVPM = new Chart(ctx3.getContext("2d"), {
+    type: "line",
+    data: { labels: minuteLabels, datasets: [{ label: "أصوات/دقيقة", data: minuteData, borderColor: "#667eea", backgroundColor: "rgba(102,126,234,0.1)", tension: 0.3, fill: true, pointRadius: 5 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true } }, scales: { y: { beginAtZero: true } } }
+  });
+}
+
+function renderRanking(){
+  const list = document.getElementById("ranking-list");
+  const counts = {};
+  allVotes.forEach(v => v.candidates.forEach(c => counts[c] = (counts[c] || 0) + 1));
+  const sorted = Object.entries(counts).map(([name, count]) => ({ name, count })).sort((a, b) => b.count - a.count);
+
+  if(sorted.length === 0){
+    list.innerHTML = "<div style='padding:20px;text-align:center;color:#999'>لا توجد بيانات</div>";
+    return;
+  }
+
+  const max = sorted[0].count;
+  list.innerHTML = sorted.map((c, i) => {
+    const rank = i + 1;
+    let medal = "🥇";
+    if(rank === 2) medal = "🥈";
+    else if(rank === 3) medal = "🥉";
+    else medal = rank;
+    const width = Math.max((c.count / max) * 100, 12);
+    return "<div class='ranking-item'><div class='ranking-left'><div class='ranking-medal'>" + medal + "</div><div class='ranking-name'>" + c.name + "</div></div><div class='ranking-right'><div class='ranking-bar' style='width:" + width + "%'>" + c.count + "</div><div class='ranking-count'>" + c.count + "</div></div></div>";
+  }).join("");
+}
+
+function renderTable(){
+  const body = document.getElementById("votes-table");
+  const note = document.getElementById("footer-note");
+  const search = document.getElementById("search").value.toLowerCase().trim();
+
+  let filtered = [...allVotes];
+  if(search) filtered = filtered.filter(v => (v.name || "").toLowerCase().includes(search) || v.candidates.join(" ").toLowerCase().includes(search));
+
+  filtered.sort((a, b) => {
+    const dir = (sortState.dir === "asc" ? 1 : -1);
+    let av = a[sortState.key];
+    let bv = b[sortState.key];
+    if(sortState.key === "candidates"){ av = a.candidates.join(","); bv = b.candidates.join(","); }
+    if(av < bv) return -1 * dir;
+    if(av > bv) return 1 * dir;
+    return 0;
+  });
+
+  body.innerHTML = "";
+  filtered.forEach((v, i) => {
+    const tr = document.createElement("tr");
+    const ourVote = v.candidates.includes("أحمد الحديدى");
+    const statusLabel = ourVote ? '<span class="vote-status-friend">تبعنا</span>' : '<span class="vote-status-enemy">مش تبعنا</span>';
+    const editBtn = adminLevel === 1 ? '<button class="btn-mini-edit" onclick="openEdit(\'' + v.id + '\')">تعديل</button>' : '';
+    tr.innerHTML = "<td>" + (i + 1) + "</td><td class='clickable-name' onclick=\"showDetails('" + v.id + "')\">" + v.name + "</td><td>" + (v.candidates.join(" و ") || "—") + "</td><td class='" + (v.validity === "صحيح" ? "status-valid" : "status-invalid") + "'>" + v.validity + "</td><td>" + statusLabel + "</td><td>" + (v.timestamp ? new Date(v.timestamp).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) : "—") + "</td><td>" + editBtn + "</td>";
+    body.appendChild(tr);
+  });
+
+  note.textContent = filtered.length === 0 ? (allVotes.length === 0 ? "لا توجد بيانات" : "لا توجد نتائج") : "عرض " + filtered.length + " من " + allVotes.length;
+}
+
+document.querySelectorAll("th[data-sort]").forEach(th => {
+  th.addEventListener("click", () => {
+    const key = th.getAttribute("data-sort");
+    if(sortState.key === key) sortState.dir = sortState.dir === "asc" ? "desc" : "asc";
+    else { sortState.key = key; sortState.dir = "asc"; }
+    renderTable();
+  });
+});
+
+document.getElementById("search").addEventListener("input", renderTable);
+window.showDetails = function(id){
+  const v = allVotes.find(x => x.id === id);
+  if(!v) return;
+
+  const body = document.getElementById("details-body");
+  const time = v.timestamp 
+    ? new Date(v.timestamp).toLocaleTimeString("ar-EG", { hour: "2-digit", minute: "2-digit", second: "2-digit" }) 
+    : "—";
+
+  const chosen = v.candidates.join(" و ") || "—";
+  const isOur = v.candidates.includes("أحمد الحديدى");
+
+  body.innerHTML = `
+    <table style='width:100%;'>
+      <tr><td><b>الاسم</b></td><td>${v.name}</td></tr>
+      <tr><td><b>اللجنة</b></td><td>${v.committee || "—"}</td></tr>
+      <tr><td><b>الوقت</b></td><td>${time}</td></tr>
+      <tr><td><b>المرشحين</b></td><td>${chosen}</td></tr>
+      <tr>
+        <td><b>الحالة</b></td>
+        <td style='color:${v.validity === "صحيح" ? "#11998e" : "#eb3349"}'>
+          ${v.validity}
+        </td>
+      </tr>
+    </table>
+
+    <div style="
+      display:inline-block;
+      margin-top:12px;
+      padding:8px 14px;
+      border-radius:50px;
+      background:${isOur ? "#d4fc79" : "#ffb347"};
+      color:${isOur ? "#2d5016" : "#5c2e0f"};
+      font-weight:700;">
+      ${isOur ? "تبعنا" : "مش تبعنا"}
+    </div>
+  `;
+};
+
+
+window.openEdit = function(id){
+  if(adminLevel !== 1){ alert("ليس لديك الصلاحية"); return; }
+  const pw = prompt("ادخل كلمة السر:");
+  if(pw !== "742018") return alert("كلمة سر خاطئة");
+  const v = allVotes.find(x => x.id === id);
+  if(!v) return;
+  window.editID = id;
+  document.getElementById("edit-name").textContent = "الناخب: " + v.name;
+  const box = document.getElementById("edit-candidates");
+  box.innerHTML = "";
+  candidatesNames.forEach(c => {
+    const chk = document.createElement("input");
+    chk.type = "checkbox";
+    chk.value = c;
+    chk.checked = v.candidates.includes(c);
+    chk.addEventListener("change", () => {
+      const checked = box.querySelectorAll("input:checked");
+      if(checked.length > 2){ chk.checked = false; alert("مرشحين فقط"); }
+    });
+    const lbl = document.createElement("label");
+    lbl.innerHTML = "<span>" + c + "</span>";
+    lbl.appendChild(chk);
+    box.appendChild(lbl);
+  });
+  document.getElementById("edit-popup").classList.remove("hidden");
+};
+
+window.closeEdit = function(){
+  document.getElementById("edit-popup").classList.add("hidden");
+};
+
+window.saveEdit = function(){
+  const box = document.getElementById("edit-candidates");
+  const checked = [...box.querySelectorAll("input:checked")].map(x => x.value);
+  if(checked.length === 0) return alert("اختر واحد");
+  if(checked.length > 2) return alert("مرشحين فقط");
+  update(ref(db, "votes/" + window.editID), { selected: checked })
+    .then(() => { showNotification("تم الحفظ"); closeEdit(); })
+    .catch(() => alert("خطأ"));
+};
+
+window.exportCSV = function(){
+  if(allVotes.length === 0) return alert("لا توجد بيانات");
+  
+  // إنشاء ورقة عمل Excel بصيغة HTML
+  let html = '<table border="1" style="border-collapse: collapse; font-family: Arial; direction: rtl;">';
+  html += '<thead style="background-color: #667eea; color: white; font-weight: bold;">';
+  html += '<tr>';
+  html += '<th style="padding: 10px; text-align: center;">الترتيب</th>';
+  html += '<th style="padding: 10px; text-align: center;">الاسم</th>';
+  html += '<th style="padding: 10px; text-align: center;">اللجنة</th>';
+  html += '<th style="padding: 10px; text-align: center;">المرشحين</th>';
+  html += '<th style="padding: 10px; text-align: center;">صحة الصوت</th>';
+  html += '<th style="padding: 10px; text-align: center;">حالة الصوت</th>';
+  html += '<th style="padding: 10px; text-align: center;">التوقيت</th>';
+  html += '</tr>';
+  html += '</thead>';
+  html += '<tbody>';
+  
+  allVotes.forEach((v, i) => {
+    const ourVote = v.candidates.includes("أحمد الحديدى");
+    const status = ourVote ? "تبعنا ✓" : "مش تبعنا ✗";
+    const time = v.timestamp ? new Date(v.timestamp).toLocaleString("ar-EG") : "—";
+    const validity = v.validity === "صحيح" ? "✓ صحيح" : "✗ باطل";
+    const bgColor = i % 2 === 0 ? "#f9f9f9" : "#ffffff";
+    
+    html += '<tr style="background-color: ' + bgColor + ';">';
+    html += '<td style="padding: 8px; text-align: center;">' + (i + 1) + '</td>';
+    html += '<td style="padding: 8px; text-align: right;">' + v.name + '</td>';
+    html += '<td style="padding: 8px; text-align: center;">' + (v.committee || "—") + '</td>';
+    html += '<td style="padding: 8px; text-align: right;">' + (v.candidates.join(" و ") || "—") + '</td>';
+    html += '<td style="padding: 8px; text-align: center; color: ' + (v.validity === "صحيح" ? "#11998e" : "#eb3349") + '; font-weight: bold;">' + validity + '</td>';
+    html += '<td style="padding: 8px; text-align: center; background-color: ' + (ourVote ? "#d4fc79" : "#ffb347") + '; color: ' + (ourVote ? "#2d5016" : "#5c2e0f") + '; font-weight: bold;">' + status + '</td>';
+    html += '<td style="padding: 8px; text-align: center;">' + time + '</td>';
+    html += '</tr>';
+  });
+  
+  html += '</tbody>';
+  html += '</table>';
+  
+  // إنشاء ملف Excel
+  const blob = new Blob([html], { type: "application/vnd.ms-excel;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "الأصوات_" + new Date().toLocaleDateString("ar-EG") + ".xls";
+  a.click();
+  URL.revokeObjectURL(url);
+  showNotification("تم تصدير البيانات بنجاح ✓");
+};
+
+window.resetAll = function(){
+  if(adminLevel !== 1){ alert("ليس لديك الصلاحية"); return; }
+  const pw = prompt("ادخل كلمة السر:");
+  if(pw !== "742018") return alert("خطأ");
+  if(!confirm("تأكيد الحذف؟")) return;
+  remove(ref(db, "votes"))
+    .then(() => { showNotification("تم"); allVotes = []; renderAll(); })
+    .catch(() => alert("خطأ"));
+};
+
+window.sendNotification = async function(){
+  const txt = document.getElementById("notify-message").value.trim();
+  const result = document.getElementById("notify-result");
+
+  if(!txt){
+    result.style.display = "block";
+    result.style.color = "#eb3349";
+    result.textContent = "اكتب رسالة";
+    return;
+  }
+
+  const mode = document.querySelector("input[name='notify-target']:checked").value;
+  let topic = "all";
+
+  if(mode === "one"){
+    const num = Number(document.getElementById("notify-committee").value);
+    if(num < 1 || num > 60){
+      result.style.display = "block";
+      result.style.color = "#eb3349";
+      result.textContent = "رقم اللجنة غير صحيح (1-60)";
+      return;
+    }
+    topic = "committee_" + num;
+  }
+
+  result.style.display = "block";
+  result.style.color = "#667eea";
+  result.textContent = "جاري الإرسال...";
+
+  try {
+    const timestamp = Date.now();
+    const messageRef = ref(db, "notifications/" + topic + "/" + timestamp);
+    await set(messageRef, {
+      message: txt,
+      topic: topic,
+      timestamp: timestamp,
+      sentAt: new Date().toISOString(),
+      type: "dashboard_notification"
+    });
+    result.style.color = "#11998e";
+    result.textContent = "تم الإرسال لـ " + (mode === "all" ? "جميع اللجان ✓" : ("اللجنة " + document.getElementById("notify-committee").value + " ✓"));
+    document.getElementById("notify-message").value = "";
+    setTimeout(() => result.style.display = "none", 3500);
+  } catch(err){
+    result.style.color = "#eb3349";
+    result.textContent = "خطأ: " + err.message;
+    console.error("Notification error:", err);
+    setTimeout(() => result.style.display = "none", 4000);
+  }
+};
+
 </script>
 </body>
 </html>
+
+
